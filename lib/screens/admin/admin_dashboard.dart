@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'doctor_screen.dart';
 import 'staff_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../auth/login_screen.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -147,8 +149,78 @@ class AdminDashboard extends StatelessWidget {
             buildDrawerItem(
               icon: Icons.logout,
               title: "Logout",
-              onTap: () {},
               color: Colors.red,
+              onTap: () async {
+
+                bool? confirmLogout =
+                await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      shape:
+                      RoundedRectangleBorder(
+                        borderRadius:
+                        BorderRadius.circular(
+                            20),
+                      ),
+                      title:
+                      const Text("Logout"),
+                      content: const Text(
+                        "Are you sure you want to logout?",
+                      ),
+                      actions: [
+
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(
+                                context,
+                                false);
+                          },
+                          child:
+                          const Text("Cancel"),
+                        ),
+
+                        ElevatedButton(
+                          style:
+                          ElevatedButton.styleFrom(
+                            backgroundColor:
+                            Colors.red,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(
+                                context,
+                                true);
+                          },
+                          child:
+                          const Text(
+                            "Logout",
+                            style: TextStyle(
+                                color:
+                                Colors.white),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                if (confirmLogout ==
+                    true) {
+
+                  await FirebaseAuth
+                      .instance
+                      .signOut();
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                      const LoginScreen(),
+                    ),
+                        (route) => false,
+                  );
+                }
+              },
             ),
           ],
         ),
