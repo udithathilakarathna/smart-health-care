@@ -188,7 +188,7 @@ class _AddDoctorScreenState
         boxShadow: [
           BoxShadow(
             color: Colors.grey
-                .withOpacity(0.08),
+                .withValues(alpha: 0.08),
             blurRadius: 12,
             spreadRadius: 2,
           )
@@ -276,7 +276,7 @@ class _AddDoctorScreenState
               child:
               DropdownButtonFormField<
                   String>(
-                value:
+                initialValue:
                 selectedSpecialization,
                 decoration:
                 const InputDecoration(
