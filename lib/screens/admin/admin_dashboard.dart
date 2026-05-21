@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'doctor_screen.dart';
 import 'staff_screen.dart';
+import 'session_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../auth/login_screen.dart';
 
@@ -9,51 +10,89 @@ class AdminDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FC),
 
+    return Scaffold(
+
+      backgroundColor:
+      const Color(0xFFF4F8FC),
+
+      /// APP BAR
       appBar: AppBar(
+
         elevation: 0,
-        backgroundColor: const Color(0xFF1565C0),
+
+        backgroundColor:
+        const Color(0xFF1565C0),
+
         title: const Text(
+
           "Smart Healthcare",
+
           style: TextStyle(
+
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+
+            fontWeight:
+            FontWeight.bold,
           ),
         ),
       ),
 
+      /// DRAWER
       drawer: Drawer(
+
         child: Column(
           children: [
 
-            /// Drawer Header
+            /// DRAWER HEADER
             Container(
+
               width: double.infinity,
-              padding: const EdgeInsets.only(
+
+              padding:
+              const EdgeInsets.only(
                 top: 60,
                 bottom: 30,
               ),
-              decoration: const BoxDecoration(
+
+              decoration:
+              const BoxDecoration(
+
                 gradient: LinearGradient(
+
                   colors: [
+
                     Color(0xFF1565C0),
                     Color(0xFF42A5F5),
+
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+
+                  begin:
+                  Alignment.topLeft,
+
+                  end:
+                  Alignment.bottomRight,
                 ),
               ),
+
               child: const Column(
                 children: [
 
                   CircleAvatar(
+
                     radius: 35,
-                    backgroundColor: Colors.white,
+
+                    backgroundColor:
+                    Colors.white,
+
                     child: Icon(
-                      Icons.admin_panel_settings,
-                      color: Color(0xFF1565C0),
+
+                      Icons
+                          .admin_panel_settings,
+
+                      color:
+                      Color(0xFF1565C0),
+
                       size: 40,
                     ),
                   ),
@@ -61,18 +100,26 @@ class AdminDashboard extends StatelessWidget {
                   SizedBox(height: 12),
 
                   Text(
+
                     "Admin Panel",
+
                     style: TextStyle(
+
                       color: Colors.white,
+
                       fontSize: 22,
-                      fontWeight: FontWeight.bold,
+
+                      fontWeight:
+                      FontWeight.bold,
                     ),
                   ),
 
                   SizedBox(height: 4),
 
                   Text(
+
                     "Hospital Management",
+
                     style: TextStyle(
                       color: Colors.white70,
                     ),
@@ -81,22 +128,32 @@ class AdminDashboard extends StatelessWidget {
               ),
             ),
 
-            /// Dashboard
+            /// DASHBOARD
             buildDrawerItem(
+
               icon: Icons.dashboard,
+
               title: "Dashboard",
+
               onTap: () {
                 Navigator.pop(context);
               },
             ),
 
-            /// Doctors
+            /// DOCTORS
             buildDrawerItem(
-              icon: Icons.local_hospital,
+
+              icon:
+              Icons.local_hospital,
+
               title: "Doctors",
+
               onTap: () {
+
                 Navigator.push(
+
                   context,
+
                   MaterialPageRoute(
                     builder: (_) =>
                     const DoctorsScreen(),
@@ -105,13 +162,19 @@ class AdminDashboard extends StatelessWidget {
               },
             ),
 
-            /// Staff Members
+            /// STAFF
             buildDrawerItem(
+
               icon: Icons.people,
+
               title: "Staff Members",
+
               onTap: () {
+
                 Navigator.push(
+
                   context,
+
                   MaterialPageRoute(
                     builder: (_) =>
                     const StaffScreen(),
@@ -120,24 +183,35 @@ class AdminDashboard extends StatelessWidget {
               },
             ),
 
-            /// Sessions
+            /// SESSIONS
             buildDrawerItem(
+
               icon: Icons.schedule,
+
               title: "Sessions",
-              onTap: () {},
+
+              onTap: () {
+
+                Navigator.push(
+
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const SessionScreen(),
+                  ),
+                );
+              },
             ),
 
-            /// Patients
+            /// BOOKINGS
             buildDrawerItem(
-              icon: Icons.person,
-              title: "Patients",
-              onTap: () {},
-            ),
 
-            /// Bookings
-            buildDrawerItem(
-              icon: Icons.calendar_today,
+              icon:
+              Icons.calendar_today,
+
               title: "Bookings",
+
               onTap: () {},
             ),
 
@@ -145,58 +219,82 @@ class AdminDashboard extends StatelessWidget {
 
             const Divider(),
 
-            /// Logout
+            /// LOGOUT
             buildDrawerItem(
+
               icon: Icons.logout,
+
               title: "Logout",
+
               color: Colors.red,
+
               onTap: () async {
 
                 bool? confirmLogout =
                 await showDialog(
+
                   context: context,
+
                   builder: (context) {
+
                     return AlertDialog(
+
                       shape:
                       RoundedRectangleBorder(
+
                         borderRadius:
                         BorderRadius.circular(
                             20),
                       ),
+
                       title:
                       const Text("Logout"),
+
                       content: const Text(
+
                         "Are you sure you want to logout?",
                       ),
+
                       actions: [
 
                         TextButton(
+
                           onPressed: () {
+
                             Navigator.pop(
                                 context,
                                 false);
                           },
+
                           child:
-                          const Text("Cancel"),
+                          const Text(
+                              "Cancel"),
                         ),
 
                         ElevatedButton(
+
                           style:
                           ElevatedButton.styleFrom(
+
                             backgroundColor:
                             Colors.red,
                           ),
+
                           onPressed: () {
+
                             Navigator.pop(
                                 context,
                                 true);
                           },
-                          child:
-                          const Text(
+
+                          child: const Text(
+
                             "Logout",
+
                             style: TextStyle(
-                                color:
-                                Colors.white),
+                              color:
+                              Colors.white,
+                            ),
                           ),
                         ),
                       ],
@@ -212,11 +310,14 @@ class AdminDashboard extends StatelessWidget {
                       .signOut();
 
                   Navigator.pushAndRemoveUntil(
+
                     context,
+
                     MaterialPageRoute(
                       builder: (_) =>
                       const LoginScreen(),
                     ),
+
                         (route) => false,
                   );
                 }
@@ -226,37 +327,62 @@ class AdminDashboard extends StatelessWidget {
         ),
       ),
 
+      /// BODY
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+
+        padding:
+        const EdgeInsets.all(20),
+
         child: Column(
+
           crossAxisAlignment:
           CrossAxisAlignment.start,
+
           children: [
 
-            /// Welcome Card
+            /// WELCOME CARD
             Container(
+
               width: double.infinity,
-              padding: const EdgeInsets.all(22),
+
+              padding:
+              const EdgeInsets.all(22),
+
               decoration: BoxDecoration(
+
                 gradient:
                 const LinearGradient(
+
                   colors: [
+
                     Color(0xFF1565C0),
                     Color(0xFF42A5F5),
+
                   ],
                 ),
+
                 borderRadius:
-                BorderRadius.circular(24),
+                BorderRadius.circular(
+                    24),
               ),
+
               child: const Column(
+
                 crossAxisAlignment:
-                CrossAxisAlignment.start,
+                CrossAxisAlignment
+                    .start,
+
                 children: [
 
                   Text(
+
                     "Good Morning 👋",
+
                     style: TextStyle(
-                      color: Colors.white70,
+
+                      color:
+                      Colors.white70,
+
                       fontSize: 16,
                     ),
                   ),
@@ -264,10 +390,15 @@ class AdminDashboard extends StatelessWidget {
                   SizedBox(height: 8),
 
                   Text(
+
                     "Admin Dashboard",
+
                     style: TextStyle(
+
                       color: Colors.white,
+
                       fontSize: 28,
+
                       fontWeight:
                       FontWeight.bold,
                     ),
@@ -276,9 +407,12 @@ class AdminDashboard extends StatelessWidget {
                   SizedBox(height: 10),
 
                   Text(
+
                     "Manage doctors, staff, sessions and bookings",
+
                     style: TextStyle(
-                      color: Colors.white70,
+                      color:
+                      Colors.white70,
                     ),
                   ),
                 ],
@@ -288,9 +422,13 @@ class AdminDashboard extends StatelessWidget {
             const SizedBox(height: 30),
 
             const Text(
+
               "Hospital Overview",
+
               style: TextStyle(
+
                 fontSize: 22,
+
                 fontWeight:
                 FontWeight.bold,
               ),
@@ -298,39 +436,58 @@ class AdminDashboard extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            /// Stats Cards
+            /// DASHBOARD CARDS
             GridView.count(
+
               shrinkWrap: true,
+
               physics:
               const NeverScrollableScrollPhysics(),
+
               crossAxisCount: 2,
+
               mainAxisSpacing: 15,
+
               crossAxisSpacing: 15,
+
               childAspectRatio: 1.15,
+
               children: const [
 
                 DashboardCard(
+
                   title: "Doctors",
+
                   value: "15",
+
                   icon:
                   Icons.local_hospital,
                 ),
 
                 DashboardCard(
+
                   title: "Staff",
+
                   value: "8",
+
                   icon: Icons.people,
                 ),
 
                 DashboardCard(
+
                   title: "Sessions",
+
                   value: "25",
+
                   icon: Icons.schedule,
                 ),
 
                 DashboardCard(
+
                   title: "Patients",
+
                   value: "120",
+
                   icon: Icons.person,
                 ),
               ],
@@ -339,9 +496,13 @@ class AdminDashboard extends StatelessWidget {
             const SizedBox(height: 30),
 
             const Text(
+
               "Quick Actions",
+
               style: TextStyle(
+
                 fontSize: 22,
+
                 fontWeight:
                 FontWeight.bold,
               ),
@@ -349,24 +510,80 @@ class AdminDashboard extends StatelessWidget {
 
             const SizedBox(height: 15),
 
+            /// ADD DOCTOR
             buildActionButton(
+
               icon: Icons.add,
+
               title: "Add Doctor",
+
+              onTap: () {
+
+                Navigator.push(
+
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const DoctorsScreen(),
+                  ),
+                );
+              },
             ),
 
+            /// ADD STAFF
             buildActionButton(
+
               icon: Icons.person_add,
-              title: "Add Staff Member",
+
+              title:
+              "Add Staff Member",
+
+              onTap: () {
+
+                Navigator.push(
+
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const StaffScreen(),
+                  ),
+                );
+              },
             ),
 
+            /// CREATE SESSION
             buildActionButton(
+
               icon: Icons.schedule,
-              title: "Create Session",
+
+              title:
+              "Create Session",
+
+              onTap: () {
+
+                Navigator.push(
+
+                  context,
+
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const SessionScreen(),
+                  ),
+                );
+              },
             ),
 
+            /// BOOKINGS
             buildActionButton(
+
               icon: Icons.assignment,
-              title: "Manage Bookings",
+
+              title:
+              "Manage Bookings",
+
+              onTap: () {},
             ),
           ],
         ),
@@ -375,51 +592,95 @@ class AdminDashboard extends StatelessWidget {
   }
 }
 
-/// Drawer Item
+/// DRAWER ITEM
 Widget buildDrawerItem({
+
   required IconData icon,
+
   required String title,
+
   required VoidCallback onTap,
+
   Color color = Colors.black87,
+
 }) {
+
   return ListTile(
-    leading: Icon(icon, color: color),
+
+    leading:
+    Icon(icon, color: color),
+
     title: Text(
+
       title,
-      style: TextStyle(color: color),
+
+      style: TextStyle(
+        color: color,
+      ),
     ),
+
     onTap: onTap,
   );
 }
 
-/// Quick Action Button
+/// ACTION BUTTON
 Widget buildActionButton({
+
   required IconData icon,
+
   required String title,
+
+  required VoidCallback onTap,
+
 }) {
+
   return Container(
+
     margin:
-    const EdgeInsets.only(bottom: 15),
+    const EdgeInsets.only(
+        bottom: 15),
+
     child: ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
+
+      style:
+      ElevatedButton.styleFrom(
+
         backgroundColor:
         const Color(0xFF1565C0),
+
         minimumSize:
-        const Size(double.infinity, 60),
+        const Size(
+            double.infinity,
+            60),
+
         shape:
         RoundedRectangleBorder(
+
           borderRadius:
-          BorderRadius.circular(18),
+          BorderRadius.circular(
+              18),
         ),
       ),
-      onPressed: () {},
-      icon: Icon(icon,
-          color: Colors.white),
+
+      onPressed: onTap,
+
+      icon: Icon(
+
+        icon,
+
+        color: Colors.white,
+      ),
+
       label: Text(
+
         title,
+
         style: const TextStyle(
+
           color: Colors.white,
+
           fontSize: 16,
+
           fontWeight:
           FontWeight.w600,
         ),
@@ -428,47 +689,69 @@ Widget buildActionButton({
   );
 }
 
-/// Dashboard Card
+/// DASHBOARD CARD
 class DashboardCard
     extends StatelessWidget {
+
   final String title;
   final String value;
   final IconData icon;
 
   const DashboardCard({
+
     super.key,
+
     required this.title,
+
     required this.value,
+
     required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
+
       padding:
       const EdgeInsets.all(18),
+
       decoration: BoxDecoration(
+
         color: Colors.white,
+
         borderRadius:
-        BorderRadius.circular(22),
+        BorderRadius.circular(
+            22),
+
         boxShadow: [
+
           BoxShadow(
+
             color:
             Colors.grey.shade200,
+
             blurRadius: 10,
           ),
         ],
       ),
+
       child: Column(
+
         crossAxisAlignment:
         CrossAxisAlignment.start,
+
         children: [
 
           CircleAvatar(
+
             backgroundColor:
             const Color(0xFFE3F2FD),
+
             child: Icon(
+
               icon,
+
               color:
               const Color(0xFF1565C0),
             ),
@@ -477,16 +760,22 @@ class DashboardCard
           const Spacer(),
 
           Text(
+
             value,
+
             style: const TextStyle(
+
               fontSize: 28,
+
               fontWeight:
               FontWeight.bold,
             ),
           ),
 
           Text(
+
             title,
+
             style: const TextStyle(
               color: Colors.grey,
             ),
