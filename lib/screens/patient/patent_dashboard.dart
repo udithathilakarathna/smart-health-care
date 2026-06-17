@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
-
+import 'appointment_history_screen.dart';
 
 class PatientDashboard extends StatelessWidget {
 
@@ -110,8 +110,19 @@ class PatientDashboard extends StatelessWidget {
 
             ListTile(
               leading: const Icon(Icons.history),
-              title: const Text("Appointment History"),
-              onTap: () {},
+              title: const Text(
+                "Appointment History",
+              ),
+              onTap: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const AppointmentHistoryScreen(),
+                  ),
+                );
+              },
             ),
 
             ListTile(
