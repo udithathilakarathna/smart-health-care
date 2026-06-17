@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
+import 'add_appointment_screen.dart';
+
 
 class PatientDashboard extends StatelessWidget {
 
@@ -92,7 +94,18 @@ class PatientDashboard extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.add_circle),
               title: const Text("Add Appointment"),
-              onTap: () {},
+              onTap: () {
+
+                Navigator.pop(context);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const AddAppointmentScreen(),
+                  ),
+                );
+              },
             ),
 
             ListTile(
