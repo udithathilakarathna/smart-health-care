@@ -117,7 +117,7 @@ class _AddStaffScreenState
         selectedRole,
 
         "role":
-        "staff",
+        "admin",
 
         "createdAt":
         Timestamp.now(),
