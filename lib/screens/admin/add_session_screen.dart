@@ -24,17 +24,15 @@ class _AddSessionScreenState
   feeController =
   TextEditingController();
 
+  final TextEditingController
+  maxAppointmentsController =
+  TextEditingController();
+
+
   String selectedDoctor = "";
   String selectedRoom = "1";
 
-  List<String> doctorList = [
 
-    "Dr. Nipun",
-    "Dr. Kaush",
-    "Dr. Jalitha",
-    "Dr. Uditha",
-
-  ];
 
   /// DATE PICKER
   Future<void> pickDate() async {
@@ -95,7 +93,8 @@ class _AddSessionScreenState
     if (selectedDoctor.isEmpty ||
         dateController.text.isEmpty ||
         timeController.text.isEmpty ||
-        feeController.text.isEmpty) {
+        feeController.text.isEmpty ||
+        maxAppointmentsController.text.isEmpty) {
 
       ScaffoldMessenger.of(context)
           .showSnackBar(
@@ -121,15 +120,13 @@ class _AddSessionScreenState
       await FirebaseFirestore.instance
           .collection("sessions")
           .where(
-            "doctorName",
-            isEqualTo:
-            selectedDoctor,
-          )
+        "doctorName",
+        isEqualTo: selectedDoctor,
+      )
           .where(
-            "sessionDate",
-            isEqualTo:
-            dateController.text,
-          )
+        "sessionDate",
+        isEqualTo: dateController.text,
+      )
           .get();
 
       /// MAX 15 SESSIONS
@@ -171,6 +168,11 @@ class _AddSessionScreenState
 
         "channelFee":
         feeController.text,
+
+        "maxAppointments":
+        int.parse(
+          maxAppointmentsController.text,
+        ),
 
         "status":
         "Available",
@@ -260,54 +262,59 @@ class _AddSessionScreenState
           children: [
 
             /// DOCTOR DROPDOWN
-            DropdownButtonFormField(
+            /// DOCTOR DROPDOWN
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection("users")
+                  .where("role", isEqualTo: "doctor")
+                  .snapshots(),
+              builder: (context, snapshot) {
 
-              decoration: InputDecoration(
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
 
-                filled: true,
+                var doctors = snapshot.data!.docs;
 
-                fillColor: Colors.white,
+                return DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: const Icon(Icons.person),
+                    hintText: "Select Doctor",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
 
-                prefixIcon:
-                const Icon(Icons.person),
+                  value:
+                  selectedDoctor.isEmpty
+                      ? null
+                      : selectedDoctor,
 
-                hintText:
-                "Select Doctor",
+                  items: doctors.map((doctor) {
 
-                border:
-                OutlineInputBorder(
+                    String doctorName =
+                    doctor["fullName"];
 
-                  borderRadius:
-                  BorderRadius.circular(16),
+                    return DropdownMenuItem<String>(
+                      value: doctorName,
+                      child: Text(doctorName),
+                    );
 
-                  borderSide:
-                  BorderSide.none,
-                ),
-              ),
+                  }).toList(),
 
-              items: doctorList
-                  .map((doctor) {
-
-                return DropdownMenuItem(
-
-                  value: doctor,
-
-                  child: Text(doctor),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDoctor = value!;
+                    });
+                  },
                 );
-              }).toList(),
-
-              onChanged: (value) {
-
-                setState(() {
-
-                  selectedDoctor =
-                  value.toString();
-                });
               },
             ),
 
             const SizedBox(height: 18),
-
             /// DATE
             TextFormField(
 
@@ -471,7 +478,23 @@ class _AddSessionScreenState
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 18),
+
+            TextFormField(
+              controller: maxAppointmentsController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.people),
+                hintText: "Maximum Appointments",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
 
             /// SAVE BUTTON
             SizedBox(
