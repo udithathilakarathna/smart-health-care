@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 
 class PatientDashboard extends StatelessWidget {
@@ -76,14 +76,34 @@ class PatientDashboard extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(Icons.calendar_month),
-              title: const Text("My Appointments"),
+              leading: const Icon(Icons.medical_services),
+              title: const Text("Doctors"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const ViewDoctorsScreen(),
+                  ),
+                );
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.add_circle),
+              title: const Text("Add Appointment"),
               onTap: () {},
             ),
 
             ListTile(
-              leading: const Icon(Icons.medical_information),
-              title: const Text("Medical Records"),
+              leading: const Icon(Icons.history),
+              title: const Text("Appointment History"),
+              onTap: () {},
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.receipt_long),
+              title: const Text("My Prescriptions"),
               onTap: () {},
             ),
 
@@ -92,7 +112,6 @@ class PatientDashboard extends StatelessWidget {
               title: const Text("Profile"),
               onTap: () {},
             ),
-
             const Spacer(),
 
             ListTile(
@@ -176,8 +195,8 @@ class PatientDashboard extends StatelessWidget {
 
                 Expanded(
                   child: dashboardCard(
-                    "Appointments",
-                    "05",
+                    "My Appointments",
+                    "0",
                     Icons.calendar_month,
                   ),
                 ),
@@ -186,9 +205,9 @@ class PatientDashboard extends StatelessWidget {
 
                 Expanded(
                   child: dashboardCard(
-                    "Reports",
-                    "12",
-                    Icons.description,
+                    "Prescriptions",
+                    "0",
+                    Icons.medical_information,
                   ),
                 ),
               ],
