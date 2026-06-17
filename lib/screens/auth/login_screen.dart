@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../admin/admin_dashboard.dart';
 import 'register_screen.dart';
+import '../patient/patent_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -86,6 +87,7 @@ class _LoginScreenState
       String role =
       userDoc["role"];
 
+
       /// ADMIN
       if (role == "admin") {
 
@@ -112,14 +114,13 @@ class _LoginScreenState
         );
       }
 
-      /// PATIENT
-      else {
 
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-                "Patient dashboard coming soon"),
+      else if (role == "patient") {
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const PatientDashboard(),
           ),
         );
       }
