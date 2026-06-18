@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../auth/login_screen.dart';
 import 'pharmacist_prescription_detail_screen.dart';
+import 'pharmacist_pending_prescriptions_screen.dart';
 
 class PharmacistDashboardScreen extends StatelessWidget {
   const PharmacistDashboardScreen({super.key});
@@ -76,7 +77,16 @@ class PharmacistDashboardScreen extends StatelessWidget {
                 _DrawerItem(
                   icon: Icons.pending_actions,
                   label: 'Pending Prescriptions',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const PharmacistPendingPrescriptionsScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const Spacer(),
                 _DrawerItem(
