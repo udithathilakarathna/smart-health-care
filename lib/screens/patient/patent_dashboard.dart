@@ -4,22 +4,12 @@ import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
 import 'appointment_history_screen.dart';
-<<<<<<<<< Temporary merge branch 1
 import 'profile_screen.dart';
-
-
-class PatientDashboard extends StatelessWidget {
-
-  const PatientDashboard({
-    super.key,
-  });
-=========
 import 'my_prescriptions_screen.dart';
 import 'patient_profile_screen.dart';
 
 class PatientDashboard extends StatelessWidget {
   const PatientDashboard({super.key});
->>>>>>>>> Temporary merge branch 2
 
   @override
   Widget build(BuildContext context) {
@@ -175,21 +165,6 @@ class PatientDashboard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-<<<<<<<<< Temporary merge branch 1
-                borderRadius:
-                BorderRadius.circular(20),
-              ),
-              child:Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
-                children: [
-
-                  Text(
-                    "Welcome 👋",
-                    style: const TextStyle(
-                      color: Colors.white70,
-                    ),
-=========
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -205,7 +180,6 @@ class PatientDashboard extends StatelessWidget {
                   Text(
                     "Smart Care for your health journey",
                     style: TextStyle(color: Colors.white70),
->>>>>>>>> Temporary merge branch 2
                   ),
                   SizedBox(height: 8),
                   Text(

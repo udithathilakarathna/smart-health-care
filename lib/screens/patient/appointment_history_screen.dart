@@ -31,7 +31,6 @@ class AppointmentHistoryScreen extends StatelessWidget {
             .collection("appointments")
             .where("patientId", isEqualTo: patientId)
             .snapshots(),
-
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -45,17 +44,13 @@ class AppointmentHistoryScreen extends StatelessWidget {
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-
             itemCount: appointments.length,
-
             itemBuilder: (context, index) {
               var appointment = appointments[index];
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 15),
-
                 padding: const EdgeInsets.all(16),
-
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -63,10 +58,8 @@ class AppointmentHistoryScreen extends StatelessWidget {
                     BoxShadow(color: Colors.grey.shade200, blurRadius: 8),
                   ],
                 ),
-
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
                     Row(
                       children: [
@@ -102,10 +95,8 @@ class AppointmentHistoryScreen extends StatelessWidget {
                       ],
                     ),
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    const SizedBox(
-                        height: 15),
+                    const SizedBox(height: 15),
+
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -124,12 +115,8 @@ class AppointmentHistoryScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-=======
-                    const SizedBox(height: 15),
->>>>>>> feature/pharmacist-role
-=======
-                    const SizedBox(height: 15),
->>>>>>> 242b370304efe757dbc456b7774f89740b5d6732
+
+                    const SizedBox(height: 12),
 
                     Text("📅 Date : ${appointment["sessionDate"]}"),
 
