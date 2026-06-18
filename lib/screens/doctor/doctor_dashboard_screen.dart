@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'doctor_appointment_utils.dart';
 import 'doctor_prescriptions_screen.dart';
 import 'today_patients_screen.dart';
 
@@ -64,15 +65,9 @@ class DoctorDashboardScreen extends StatelessWidget {
                             builder: (context, appointmentSnapshot) {
                               final appointments =
                                   appointmentSnapshot.data?.docs ?? [];
-                              final today = DateTime.now();
-
-                              final todayCount = appointments.where((doc) {
-                                final sessionDate =
-                                    doc.data()['sessionDate'] as String?;
-                                return sessionDate != null &&
-                                    sessionDate ==
-                                        '${today.day}/${today.month}/${today.year}';
-                              }).length;
+                              final bookedCount = uniqueAppointmentsByPatient(
+                                appointments,
+                              ).length;
 
                               return Column(
                                 children: [
@@ -80,9 +75,9 @@ class DoctorDashboardScreen extends StatelessWidget {
                                     children: [
                                       Expanded(
                                         child: _StatCard(
-                                          label: 'Today Queue',
-                                          value: todayCount.toString(),
-                                          icon: Icons.today,
+                                          label: 'Booked Patients',
+                                          value: bookedCount.toString(),
+                                          icon: Icons.event_available,
                                           tint: const Color(0xFF1565C0),
                                         ),
                                       ),
