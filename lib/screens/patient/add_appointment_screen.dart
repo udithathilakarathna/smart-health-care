@@ -326,9 +326,10 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                               await FirebaseFirestore.instance
                                                   .collection("appointments")
                                                   .add({
-                                                    "patientId": patientId,
-
-                                                    "patientName": patientName,
+                                                    "patientId": FirebaseAuth
+                                                        .instance
+                                                        .currentUser!
+                                                        .uid,
 
                                                     "doctorName":
                                                         session["doctorName"],

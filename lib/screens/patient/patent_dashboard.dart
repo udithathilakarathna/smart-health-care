@@ -4,8 +4,6 @@ import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
 import 'appointment_history_screen.dart';
-import 'my_prescriptions_screen.dart';
-import 'patient_profile_screen.dart';
 
 class PatientDashboard extends StatelessWidget {
   const PatientDashboard({super.key});
@@ -121,7 +119,12 @@ class PatientDashboard extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text("Profile"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              },
             ),
             const Spacer(),
 
@@ -172,8 +175,8 @@ class PatientDashboard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Smart Care for your health journey",
-                    style: TextStyle(color: Colors.white70),
+                    "Welcome Patient 👋",
+                    style: const TextStyle(color: Colors.white70),
                   ),
                   SizedBox(height: 8),
                   Text(
