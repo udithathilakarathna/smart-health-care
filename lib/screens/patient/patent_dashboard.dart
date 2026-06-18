@@ -5,6 +5,7 @@ import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
 import 'appointment_history_screen.dart';
 
+
 class PatientDashboard extends StatelessWidget {
 
 
@@ -134,7 +135,9 @@ class PatientDashboard extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text("Profile"),
-              onTap: () {},
+              onTap: () {
+
+              },
             ),
             const Spacer(),
 
