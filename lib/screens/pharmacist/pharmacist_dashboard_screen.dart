@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
 import 'pharmacist_prescription_detail_screen.dart';
 import 'pharmacist_pending_prescriptions_screen.dart';
+import 'pharmacist_reviewed_prescriptions_screen.dart';
 
 class PharmacistDashboardScreen extends StatelessWidget {
   const PharmacistDashboardScreen({super.key});
@@ -178,6 +179,15 @@ class PharmacistDashboardScreen extends StatelessWidget {
                             label: 'Pending',
                             value: pending.toString(),
                             icon: Icons.pending_actions,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const PharmacistPendingPrescriptionsScreen(),
+                                ),
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -186,6 +196,15 @@ class PharmacistDashboardScreen extends StatelessWidget {
                             label: 'Reviewed',
                             value: reviewed.toString(),
                             icon: Icons.verified,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const PharmacistReviewedPrescriptionsScreen(),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -330,48 +349,54 @@ class _StatCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
+    required this.onTap,
   });
 
   final String label;
   final String value;
   final IconData icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
         borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0B6E4F).withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(icon, color: const Color(0xFF0B6E4F)),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0B6E4F).withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(14),
                 ),
+                child: Icon(icon, color: const Color(0xFF0B6E4F)),
               ),
-              Text(
-                label,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
