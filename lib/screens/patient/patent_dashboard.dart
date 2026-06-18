@@ -8,8 +8,6 @@ import 'appointment_history_screen.dart';
 
 class PatientDashboard extends StatelessWidget {
 
-
-
   const PatientDashboard({
     super.key,
   });
