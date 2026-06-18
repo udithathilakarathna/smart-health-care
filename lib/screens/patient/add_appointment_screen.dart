@@ -139,17 +139,9 @@ class _AddAppointmentScreenState
               stream: selectedDoctor == null
                   ? FirebaseFirestore.instance
                   .collection("sessions")
-                  .where(
-                "status",
-                isEqualTo: "Available",
-              )
                   .snapshots()
                   : FirebaseFirestore.instance
                   .collection("sessions")
-                  .where(
-                "status",
-                isEqualTo: "Available",
-              )
                   .where(
                 "doctorName",
                 isEqualTo: selectedDoctor,
@@ -336,7 +328,9 @@ class _AddAppointmentScreenState
                                     0xFF1565C0),
                               ),
 
-                              onPressed: () {
+                              onPressed: availableSlots == 0
+                                  ? null
+                                  : () {
 
                                 showDialog(
                                   context:
@@ -387,8 +381,16 @@ class _AddAppointmentScreenState
                                             if (bookingCount >= maxAppointments) {
                                               status = "Not Available";
                                             }
+                                            QuerySnapshot bookings =
+                                            await FirebaseFirestore.instance
+                                                .collection("appointments")
+                                                .get();
+
+                                            int nextNumber =
+                                                bookings.docs.length + 1;
+
                                             String bookingNumber =
-                                                "BK${DateTime.now().millisecondsSinceEpoch}";
+                                                "BK${nextNumber.toString().padLeft(3, '0')}";
 
                                             var doctorDoc =
                                             await FirebaseFirestore.instance
@@ -405,6 +407,7 @@ class _AddAppointmentScreenState
 
                                             String doctorId =
                                                 doctorDoc.docs.first.id;
+
                                             // Save Appointment
                                             await FirebaseFirestore.instance
                                                 .collection("appointments")
@@ -477,10 +480,11 @@ class _AddAppointmentScreenState
                                   },
                                 );
                               },
-
-                              child: const Text(
-                                "Book Appointment",
-                                style: TextStyle(
+                              child: Text(
+                                availableSlots == 0
+                                    ? "Session Full"
+                                    : "Book Appointment",
+                                style: const TextStyle(
                                   color: Colors.white,
                                 ),
                               ),
