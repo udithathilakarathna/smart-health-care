@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'patent_dashboard.dart';
+import '../../widgets/smart_back_button.dart';
+
 class AddAppointmentScreen extends StatefulWidget {
   const AddAppointmentScreen({super.key});
 
   @override
-  State<AddAppointmentScreen> createState() =>
-      _AddAppointmentScreenState();
+  State<AddAppointmentScreen> createState() => _AddAppointmentScreenState();
 }
 
-class _AddAppointmentScreenState
-    extends State<AddAppointmentScreen> {
-
+class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
   String? selectedDoctor;
-
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +22,9 @@ class _AddAppointmentScreenState
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF1565C0),
+        leading: SmartBackButton(
+          fallbackPageBuilder: (_) => const PatientDashboard(),
+        ),
         title: const Text(
           "Book Appointment",
           style: TextStyle(color: Colors.white),
@@ -34,7 +36,6 @@ class _AddAppointmentScreenState
 
         child: Column(
           children: [
-
             /// HEADER CARD
             Container(
               width: double.infinity,
@@ -42,27 +43,20 @@ class _AddAppointmentScreenState
 
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF1565C0),
-                    Color(0xFF42A5F5),
-                  ],
+                  colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
                 ),
-                borderRadius:
-                BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
               ),
 
               child: const Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Text(
                     "Book New Appointment",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
-                      fontWeight:
-                      FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
@@ -70,9 +64,7 @@ class _AddAppointmentScreenState
 
                   Text(
                     "Find and book a doctor session",
-                    style: TextStyle(
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
@@ -87,7 +79,6 @@ class _AddAppointmentScreenState
                   .where("role", isEqualTo: "doctor")
                   .snapshots(),
               builder: (context, snapshot) {
-
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();
                 }
@@ -95,7 +86,7 @@ class _AddAppointmentScreenState
                 var doctors = snapshot.data!.docs;
 
                 return DropdownButtonFormField<String>(
-                  value: selectedDoctor,
+                  initialValue: selectedDoctor,
 
                   decoration: InputDecoration(
                     filled: true,
@@ -103,27 +94,20 @@ class _AddAppointmentScreenState
                     prefixIcon: const Icon(Icons.person),
                     hintText: "Select Doctor",
                     border: OutlineInputBorder(
-                      borderRadius:
-                      BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
                     ),
                   ),
 
                   items: doctors.map((doctor) {
-
                     return DropdownMenuItem<String>(
                       value: doctor["fullName"],
-                      child: Text(
-                        doctor["fullName"],
-                      ),
+                      child: Text(doctor["fullName"]),
                     );
-
                   }).toList(),
 
                   onChanged: (value) {
-
                     setState(() {
-
                       selectedDoctor = value;
                     });
                   },
@@ -134,370 +118,292 @@ class _AddAppointmentScreenState
             const SizedBox(height: 20),
 
             /// SESSION LIST
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: selectedDoctor == null
-                  ? FirebaseFirestore.instance
-                  .collection("sessions")
-                  .snapshots()
-                  : FirebaseFirestore.instance
-                  .collection("sessions")
-                  .where(
-                "doctorName",
-                isEqualTo: selectedDoctor,
-              )
-                  .snapshots(),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: selectedDoctor == null
+                    ? FirebaseFirestore.instance
+                          .collection("sessions")
+                          .where("status", isEqualTo: "Available")
+                          .snapshots()
+                    : FirebaseFirestore.instance
+                          .collection("sessions")
+                          .where("status", isEqualTo: "Available")
+                          .where("doctorName", isEqualTo: selectedDoctor)
+                          .snapshots(),
 
-              builder: (context, snapshot) {
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text("No Available Sessions"));
+                  }
 
-                if (!snapshot.hasData ||
-                    snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "No Available Sessions",
-                    ),
-                  );
-                }
+                  var sessions = snapshot.data!.docs;
 
-                var sessions = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: sessions.length,
 
-                return ListView.builder(
-                  itemCount: sessions.length,
+                    itemBuilder: (context, index) {
+                      var session = sessions[index];
 
-                  itemBuilder: (context, index) {
+                      int bookingCount = session["bookingCount"];
 
-                    var session = sessions[index];
+                      int maxAppointments = session["maxAppointments"];
 
-                    int bookingCount =
-                    session["bookingCount"];
+                      int availableSlots = maxAppointments - bookingCount;
 
-                    int maxAppointments =
-                    session["maxAppointments"];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 15),
 
-                    int availableSlots =
-                        maxAppointments -
-                            bookingCount;
+                        padding: const EdgeInsets.all(16),
 
-                    return Container(
-                      margin: const EdgeInsets.only(
-                        bottom: 15,
-                      ),
-
-                      padding:
-                      const EdgeInsets.all(16),
-
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                        BorderRadius.circular(
-                            20),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                            Colors.grey.shade200,
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-
-                          Row(
-                            children: [
-
-                              const CircleAvatar(
-                                child: Icon(
-                                  Icons.local_hospital,
-                                ),
-                              ),
-
-                              const SizedBox(
-                                  width: 12),
-
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-
-                                    Text(
-                                      "Dr. ${session["doctorName"]}",
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-
-                                    FutureBuilder<QuerySnapshot>(
-                                      future: FirebaseFirestore.instance
-                                          .collection("users")
-                                          .where(
-                                        "fullName",
-                                        isEqualTo:
-                                        session["doctorName"],
-                                      )
-                                          .limit(1)
-                                          .get(),
-                                      builder: (
-                                          context,
-                                          doctorSnapshot,
-                                          ) {
-
-                                        if (!doctorSnapshot.hasData ||
-                                            doctorSnapshot
-                                                .data!
-                                                .docs
-                                                .isEmpty) {
-                                          return const SizedBox();
-                                        }
-
-                                        return Text(
-                                          doctorSnapshot
-                                              .data!
-                                              .docs
-                                              .first[
-                                          "specialization"],
-                                          style: TextStyle(
-                                            color:
-                                            Colors.grey.shade600,
-                                            fontSize: 14,
-                                          ),
-                                        );
-                                      },
-                                    ),
-
-                                    Text(
-                                      "Room ${session["roomNumber"]}",
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 15),
-
-                          Text(
-                            "📅 Date : ${session["sessionDate"]}",
-                          ),
-
-                          Text(
-                            "⏰ Time : ${session["sessionTime"]}",
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          Text(
-                            "💰 Fee : Rs. ${session["channelFee"]}",
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          Text(
-                            "Available Slots : $availableSlots / $maxAppointments",
-                            style:
-                            const TextStyle(
-                              color: Colors.green,
-                              fontWeight:
-                              FontWeight.bold,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              blurRadius: 8,
                             ),
-                          ),
+                          ],
+                        ),
 
-                          const SizedBox(height: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const CircleAvatar(
+                                  child: Icon(Icons.local_hospital),
+                                ),
 
-                          SizedBox(
-                            width:
-                            double.infinity,
+                                const SizedBox(width: 12),
 
-                            child: ElevatedButton(
-                              style:
-                              ElevatedButton
-                                  .styleFrom(
-                                backgroundColor:
-                                const Color(
-                                    0xFF1565C0),
-                              ),
-
-                              onPressed: availableSlots == 0
-                                  ? null
-                                  : () {
-
-                                showDialog(
-                                  context:
-                                  context,
-
-                                  builder: (_) {
-
-                                    return AlertDialog(
-                                      title:
-                                      const Text(
-                                        "Confirm Appointment",
-                                      ),
-
-                                      content:
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
                                       Text(
-                                        "Book appointment with ${session["doctorName"]} ?",
+                                        "Dr. ${session["doctorName"]}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
                                       ),
 
-                                      actions: [
-
-                                        TextButton(
-                                          onPressed:
-                                              () {
-                                            Navigator.pop(
-                                                context);
-                                          },
-                                          child:
-                                          const Text(
-                                            "Cancel",
-                                          ),
-                                        ),
-
-                                        ElevatedButton(
-                                          onPressed: () async {
-
-                                            String sessionId = session.id;
-
-                                            int bookingCount =
-                                            session["bookingCount"];
-
-                                            int maxAppointments =
-                                            session["maxAppointments"];
-
-                                            bookingCount++;
-
-                                            String status = "Available";
-
-                                            if (bookingCount >= maxAppointments) {
-                                              status = "Not Available";
-                                            }
-                                            QuerySnapshot bookings =
-                                            await FirebaseFirestore.instance
-                                                .collection("appointments")
-                                                .get();
-
-                                            int nextNumber =
-                                                bookings.docs.length + 1;
-
-                                            String bookingNumber =
-                                                "BK${nextNumber.toString().padLeft(3, '0')}";
-
-                                            var doctorDoc =
-                                            await FirebaseFirestore.instance
-                                                .collection("users")
-                                                .where(
+                                      FutureBuilder<QuerySnapshot>(
+                                        future: FirebaseFirestore.instance
+                                            .collection("users")
+                                            .where(
                                               "fullName",
                                               isEqualTo: session["doctorName"],
                                             )
-                                                .limit(1)
-                                                .get();
+                                            .limit(1)
+                                            .get(),
+                                        builder: (context, doctorSnapshot) {
+                                          if (!doctorSnapshot.hasData ||
+                                              doctorSnapshot
+                                                  .data!
+                                                  .docs
+                                                  .isEmpty) {
+                                            return const SizedBox();
+                                          }
 
-                                            String specialization =
-                                            doctorDoc.docs.first["specialization"];
+                                          return Text(
+                                            doctorSnapshot
+                                                .data!
+                                                .docs
+                                                .first["specialization"],
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 14,
+                                            ),
+                                          );
+                                        },
+                                      ),
 
-                                            String doctorId =
-                                                doctorDoc.docs.first.id;
+                                      Text("Room ${session["roomNumber"]}"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
 
-                                            // Save Appointment
-                                            await FirebaseFirestore.instance
-                                                .collection("appointments")
-                                                .add({
-                                              "bookingNumber":
-                                              bookingNumber,
+                            const SizedBox(height: 15),
 
-                                              "patientId":
-                                              FirebaseAuth.instance.currentUser!.uid,
+                            Text("📅 Date : ${session["sessionDate"]}"),
 
-                                              "doctorId":
-                                              doctorId,
+                            Text("⏰ Time : ${session["sessionTime"]}"),
 
-                                              "doctorName":
-                                              session["doctorName"],
+                            const SizedBox(height: 10),
 
-                                              "specialization":
-                                              specialization,
+                            Text("💰 Fee : Rs. ${session["channelFee"]}"),
 
-                                              "sessionId":
-                                              sessionId,
+                            const SizedBox(height: 10),
 
-                                              "sessionDate":
-                                              session["sessionDate"],
+                            Text(
+                              "Available Slots : $availableSlots / $maxAppointments",
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
 
-                                              "sessionTime":
-                                              session["sessionTime"],
+                            const SizedBox(height: 15),
 
-                                              "roomNumber":
-                                              session["roomNumber"],
+                            SizedBox(
+                              width: double.infinity,
 
-                                              "channelFee":
-                                              session["channelFee"],
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1565C0),
+                                ),
 
-                                              "status":
-                                              "Booked",
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
 
-                                              "bookingDate":
-                                              Timestamp.now(),
-                                            });
-
-                                            // Update Session
-                                            await FirebaseFirestore.instance
-                                                .collection("sessions")
-                                                .doc(sessionId)
-                                                .update({
-
-                                              "bookingCount": bookingCount,
-                                              "status": status,
-                                            });
-
-                                            Navigator.pop(context);
-
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  "Appointment Booked Successfully",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child:
-                                          const Text(
-                                            "Confirm",
-                                          ),
+                                    builder: (_) {
+                                      return AlertDialog(
+                                        title: const Text(
+                                          "Confirm Appointment",
                                         ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: Text(
-                                availableSlots == 0
-                                    ? "Session Full"
-                                    : "Book Appointment",
-                                style: const TextStyle(
-                                  color: Colors.white,
+
+                                        content: Text(
+                                          "Book appointment with ${session["doctorName"]} ?",
+                                        ),
+
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Cancel"),
+                                          ),
+
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              String sessionId = session.id;
+                                              String patientId = FirebaseAuth
+                                                  .instance
+                                                  .currentUser!
+                                                  .uid;
+
+                                              DocumentSnapshot<
+                                                Map<String, dynamic>
+                                              >
+                                              patientDoc =
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection("users")
+                                                      .doc(patientId)
+                                                      .get();
+
+                                              String patientName =
+                                                  patientDoc.data()?['fullName']
+                                                      as String? ??
+                                                  'Patient';
+
+                                              int bookingCount =
+                                                  session["bookingCount"];
+
+                                              int maxAppointments =
+                                                  session["maxAppointments"];
+
+                                              bookingCount++;
+
+                                              String status = "Available";
+
+                                              if (bookingCount >=
+                                                  maxAppointments) {
+                                                status = "Not Available";
+                                              }
+
+                                              // Save Appointment
+                                              await FirebaseFirestore.instance
+                                                  .collection("appointments")
+                                                  .add({
+                                                    "patientId": FirebaseAuth
+                                                        .instance
+                                                        .currentUser!
+                                                        .uid,
+
+                                                    "doctorName":
+                                                        session["doctorName"],
+
+                                                    "tokenNumber": bookingCount,
+
+                                                    "sessionId": sessionId,
+
+                                                    "sessionDate":
+                                                        session["sessionDate"],
+
+                                                    "sessionTime":
+                                                        session["sessionTime"],
+
+                                                    "roomNumber":
+                                                        session["roomNumber"],
+
+                                                    "channelFee":
+                                                        session["channelFee"],
+
+                                                    "status": "Booked",
+
+                                                    "bookingDate":
+                                                        Timestamp.now(),
+                                                  });
+
+                                              // Update Session
+                                              await FirebaseFirestore.instance
+                                                  .collection("sessions")
+                                                  .doc(sessionId)
+                                                  .update({
+                                                    "bookingCount":
+                                                        bookingCount,
+                                                    "status": status,
+                                                  });
+
+                                              if (!context.mounted) {
+                                                return;
+                                              }
+
+                                              Navigator.pop(context);
+
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "Appointment Booked Successfully",
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Text("Confirm"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+
+                                child: const Text(
+                                  "Book Appointment",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
           ],
         ),
       ),
