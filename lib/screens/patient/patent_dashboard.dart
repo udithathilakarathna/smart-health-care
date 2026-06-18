@@ -4,6 +4,7 @@ import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
 import 'appointment_history_screen.dart';
+<<<<<<< HEAD
 import 'profile_screen.dart';
 
 
@@ -12,6 +13,13 @@ class PatientDashboard extends StatelessWidget {
   const PatientDashboard({
     super.key,
   });
+=======
+import 'my_prescriptions_screen.dart';
+import 'patient_profile_screen.dart';
+
+class PatientDashboard extends StatelessWidget {
+  const PatientDashboard({super.key});
+>>>>>>> feature/pharmacist-role
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +37,16 @@ class PatientDashboard extends StatelessWidget {
       drawer: Drawer(
         child: Column(
           children: [
-
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(
-                top: 60,
-                bottom: 30,
-              ),
+              padding: const EdgeInsets.only(top: 60, bottom: 30),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF1565C0),
-                    Color(0xFF42A5F5),
-                  ],
+                  colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
                 ),
               ),
               child: const Column(
                 children: [
-
                   CircleAvatar(
                     radius: 35,
                     backgroundColor: Colors.white,
@@ -83,10 +83,7 @@ class PatientDashboard extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                    const ViewDoctorsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ViewDoctorsScreen()),
                 );
               },
             ),
@@ -95,14 +92,12 @@ class PatientDashboard extends StatelessWidget {
               leading: const Icon(Icons.add_circle),
               title: const Text("Add Appointment"),
               onTap: () {
-
                 Navigator.pop(context);
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                    const AddAppointmentScreen(),
+                    builder: (_) => const AddAppointmentScreen(),
                   ),
                 );
               },
@@ -110,16 +105,12 @@ class PatientDashboard extends StatelessWidget {
 
             ListTile(
               leading: const Icon(Icons.history),
-              title: const Text(
-                "Appointment History",
-              ),
+              title: const Text("Appointment History"),
               onTap: () {
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                    const AppointmentHistoryScreen(),
+                    builder: (_) => const AppointmentHistoryScreen(),
                   ),
                 );
               },
@@ -128,7 +119,14 @@ class PatientDashboard extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.receipt_long),
               title: const Text("My Prescriptions"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MyPrescriptionsScreen(),
+                  ),
+                );
+              },
             ),
 
             ListTile(
@@ -147,25 +145,19 @@ class PatientDashboard extends StatelessWidget {
             const Spacer(),
 
             ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: Colors.red,
-              ),
-              title: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.red),
-              ),
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text("Logout", style: TextStyle(color: Colors.red)),
               onTap: () async {
-
                 await FirebaseAuth.instance.signOut();
+
+                if (!context.mounted) {
+                  return;
+                }
 
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                    const LoginScreen(),
-                  ),
-                      (route) => false,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
                 );
               },
             ),
@@ -175,21 +167,18 @@ class PatientDashboard extends StatelessWidget {
 
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+        child: ListView(
           children: [
-
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(22),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF1565C0),
-                    Color(0xFF42A5F5),
-                  ],
+                  colors: [Color(0xFF0F4C81), Color(0xFF1D9BF0)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+<<<<<<< HEAD
                 borderRadius:
                 BorderRadius.circular(20),
               ),
@@ -203,28 +192,44 @@ class PatientDashboard extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white70,
                     ),
+=======
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F4C81).withValues(alpha: 0.18),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
                   ),
-
+                ],
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Smart Care for your health journey",
+                    style: TextStyle(color: Colors.white70),
+>>>>>>> feature/pharmacist-role
+                  ),
                   SizedBox(height: 8),
-
                   Text(
                     "Patient Dashboard",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 26,
-                      fontWeight:
-                      FontWeight.bold,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Book care, manage visits, and track prescriptions in one place.",
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 25),
-
+            const SizedBox(height: 20),
             Row(
               children: [
-
                 Expanded(
                   child: dashboardCard(
                     "My Appointments",
@@ -232,14 +237,36 @@ class PatientDashboard extends StatelessWidget {
                     Icons.calendar_month,
                   ),
                 ),
-
                 const SizedBox(width: 15),
-
                 Expanded(
                   child: dashboardCard(
                     "Prescriptions",
                     "0",
                     Icons.medical_information,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: dashboardCard("Doctors", "Find", Icons.local_hospital),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: dashboardCard(
+                    "Profile",
+                    "View",
+                    Icons.person,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PatientProfileScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -251,40 +278,55 @@ class PatientDashboard extends StatelessWidget {
   }
 
   Widget dashboardCard(
-      String title,
-      String value,
-      IconData icon,
-      ) {
+    String title,
+    String value,
+    IconData icon, {
+    VoidCallback? onTap,
+  }) {
     return Container(
-      height: 150,
-      padding: const EdgeInsets.all(16),
+      height: 145,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-        BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
-        children: [
-
-          Icon(
-            icon,
-            color: const Color(0xFF1565C0),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
-
-          const Spacer(),
-
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F4C81).withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF0F4C81)),
+                ),
+                const Spacer(),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(title, style: TextStyle(color: Colors.grey.shade700)),
+              ],
             ),
           ),
-
-          Text(title),
-        ],
+        ),
       ),
     );
   }
