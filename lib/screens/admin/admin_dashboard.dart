@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
-import 'doctor_screen.dart';
-import 'staff_screen.dart';
-import 'session_screen.dart';
-import 'bookings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import '../auth/login_screen.dart';
+import 'bookings_screen.dart';
+import 'doctor_screen.dart';
+import 'patients_screen.dart';
+import 'session_screen.dart';
+import 'staff_screen.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -13,199 +15,128 @@ class AdminDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8FC),
-
-      /// APP BAR
       appBar: AppBar(
         elevation: 0,
-
         backgroundColor: const Color(0xFF1565C0),
-
         title: const Text(
-          "Smart Healthcare",
-
+          'Smart Healthcare',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-
-      /// DRAWER
       drawer: Drawer(
         child: Column(
           children: [
-            /// DRAWER HEADER
             Container(
               width: double.infinity,
-
               padding: const EdgeInsets.only(top: 60, bottom: 30),
-
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
-
                   begin: Alignment.topLeft,
-
                   end: Alignment.bottomRight,
                 ),
               ),
-
               child: const Column(
                 children: [
                   CircleAvatar(
                     radius: 35,
-
                     backgroundColor: Colors.white,
-
                     child: Icon(
                       Icons.admin_panel_settings,
-
                       color: Color(0xFF1565C0),
-
                       size: 40,
                     ),
                   ),
-
                   SizedBox(height: 12),
-
                   Text(
-                    "Admin Panel",
-
+                    'Admin Panel',
                     style: TextStyle(
                       color: Colors.white,
-
                       fontSize: 22,
-
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   SizedBox(height: 4),
-
                   Text(
-                    "Hospital Management",
-
+                    'Hospital Management',
                     style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
             ),
-
-            /// DASHBOARD
             buildDrawerItem(
               icon: Icons.dashboard,
-
-              title: "Dashboard",
-
-              onTap: () {
-                Navigator.pop(context);
-              },
+              title: 'Dashboard',
+              onTap: () => Navigator.pop(context),
             ),
-
-            /// DOCTORS
             buildDrawerItem(
               icon: Icons.local_hospital,
-
-              title: "Doctors",
-
+              title: 'Doctors',
               onTap: () {
                 Navigator.push(
                   context,
-
                   MaterialPageRoute(builder: (_) => const DoctorsScreen()),
                 );
               },
             ),
-
-            /// STAFF
             buildDrawerItem(
               icon: Icons.people,
-
-              title: "Staff Members",
-
+              title: 'Staff Members',
               onTap: () {
                 Navigator.push(
                   context,
-
                   MaterialPageRoute(builder: (_) => const StaffScreen()),
                 );
               },
             ),
-
-            /// SESSIONS
             buildDrawerItem(
               icon: Icons.schedule,
-
-              title: "Sessions",
-
+              title: 'Sessions',
               onTap: () {
                 Navigator.push(
                   context,
-
                   MaterialPageRoute(builder: (_) => const SessionScreen()),
                 );
               },
             ),
-
-            /// BOOKINGS
             buildDrawerItem(
               icon: Icons.calendar_today,
-
-              title: "Bookings",
-
+              title: 'Bookings',
               onTap: () {
                 Navigator.push(
                   context,
-
                   MaterialPageRoute(builder: (_) => const BookingsScreen()),
                 );
               },
             ),
-
             const Spacer(),
-
             const Divider(),
-
-            /// LOGOUT
             buildDrawerItem(
               icon: Icons.logout,
-
-              title: "Logout",
-
+              title: 'Logout',
               color: Colors.red,
-
               onTap: () async {
-                bool? confirmLogout = await showDialog(
+                final confirmLogout = await showDialog<bool>(
                   context: context,
-
-                  builder: (context) {
+                  builder: (dialogContext) {
                     return AlertDialog(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
-
-                      title: const Text("Logout"),
-
-                      content: const Text("Are you sure you want to logout?"),
-
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to logout?'),
                       actions: [
                         TextButton(
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                          },
-
-                          child: const Text("Cancel"),
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          child: const Text('Cancel'),
                         ),
-
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                           ),
-
-                          onPressed: () {
-                            Navigator.pop(context, true);
-                          },
-
+                          onPressed: () => Navigator.pop(dialogContext, true),
                           child: const Text(
-                            "Logout",
-
+                            'Logout',
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -216,12 +147,10 @@ class AdminDashboard extends StatelessWidget {
 
                 if (confirmLogout == true) {
                   await FirebaseAuth.instance.signOut();
-
+                  if (!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
                     context,
-
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
-
                     (route) => false,
                   );
                 }
@@ -230,244 +159,262 @@ class AdminDashboard extends StatelessWidget {
           ],
         ),
       ),
-
-      /// BODY
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 1100;
+            final isMedium = constraints.maxWidth >= 700;
+            final cardWidth = isWide
+                ? (constraints.maxWidth - 36) / 4
+                : isMedium
+                ? (constraints.maxWidth - 12) / 2
+                : constraints.maxWidth;
+            final actionWidth = isWide
+                ? (constraints.maxWidth - 24) / 3
+                : isMedium
+                ? (constraints.maxWidth - 12) / 2
+                : constraints.maxWidth;
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            /// WELCOME CARD
-            Container(
-              width: double.infinity,
-
-              padding: const EdgeInsets.all(22),
-
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
-                ),
-
-                borderRadius: BorderRadius.circular(24),
-              ),
-
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    "Good Morning 👋",
-
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-
-                  SizedBox(height: 8),
-
-                  Text(
-                    "Admin Dashboard",
-
-                    style: TextStyle(
-                      color: Colors.white,
-
-                      fontSize: 28,
-
-                      fontWeight: FontWeight.bold,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(24),
                   ),
-
-                  SizedBox(height: 10),
-
-                  Text(
-                    "Manage doctors, staff, sessions and bookings",
-
-                    style: TextStyle(color: Colors.white70),
+                  child: const Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.admin_panel_settings,
+                          color: Color(0xFF1565C0),
+                          size: 30,
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Good Morning 👋',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Admin Dashboard',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              'A clean overview of doctors, staff, sessions and bookings.',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "Hospital Overview",
-
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 18),
-
-            /// DASHBOARD CARDS
-            GridView.count(
-              shrinkWrap: true,
-
-              physics: const NeverScrollableScrollPhysics(),
-
-              crossAxisCount: 2,
-
-              mainAxisSpacing: 15,
-
-              crossAxisSpacing: 15,
-
-              childAspectRatio: 1.15,
-
-              children: const [
-                DashboardCard(
-                  title: "Doctors",
-
-                  value: "15",
-
-                  icon: Icons.local_hospital,
                 ),
-
-                DashboardCard(title: "Staff", value: "8", icon: Icons.people),
-
-                DashboardCard(
-                  title: "Sessions",
-
-                  value: "25",
-
-                  icon: Icons.schedule,
+                const SizedBox(height: 24),
+                const _SectionHeader(
+                  title: 'Hospital Overview',
+                  subtitle: 'Tap a card to open full details',
                 ),
-
-                DashboardCard(
-                  title: "Patients",
-
-                  value: "120",
-
-                  icon: Icons.person,
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    DashboardCard(
+                      width: cardWidth,
+                      title: 'Doctors',
+                      value: '15',
+                      icon: Icons.local_hospital,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DoctorsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    DashboardCard(
+                      width: cardWidth,
+                      title: 'Staff',
+                      value: '8',
+                      icon: Icons.people,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const StaffScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    DashboardCard(
+                      width: cardWidth,
+                      title: 'Sessions',
+                      value: '25',
+                      icon: Icons.schedule,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SessionScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    DashboardCard(
+                      width: cardWidth,
+                      title: 'Patients',
+                      value: '120',
+                      icon: Icons.person,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PatientsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                const _SectionHeader(
+                  title: 'Quick Actions',
+                  subtitle: 'Fast access to common admin tasks',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    QuickActionCard(
+                      width: actionWidth,
+                      icon: Icons.add,
+                      title: 'Add Doctor',
+                      subtitle: 'Create a new doctor profile',
+                      accent: const Color(0xFF1565C0),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DoctorsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    QuickActionCard(
+                      width: actionWidth,
+                      icon: Icons.person_add,
+                      title: 'Add Staff',
+                      subtitle: 'Register staff members',
+                      accent: const Color(0xFF1C7C54),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const StaffScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    QuickActionCard(
+                      width: actionWidth,
+                      icon: Icons.schedule,
+                      title: 'Create Session',
+                      subtitle: 'Open doctor session slots',
+                      accent: const Color(0xFF8E6C00),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SessionScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    QuickActionCard(
+                      width: actionWidth,
+                      icon: Icons.assignment,
+                      title: 'Bookings',
+                      subtitle: 'Review all patient bookings',
+                      accent: const Color(0xFF5E5E5E),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const BookingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "Quick Actions",
-
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 15),
-
-            /// ADD DOCTOR
-            buildActionButton(
-              icon: Icons.add,
-
-              title: "Add Doctor",
-
-              onTap: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(builder: (_) => const DoctorsScreen()),
-                );
-              },
-            ),
-
-            /// ADD STAFF
-            buildActionButton(
-              icon: Icons.person_add,
-
-              title: "Add Staff Member",
-
-              onTap: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(builder: (_) => const StaffScreen()),
-                );
-              },
-            ),
-
-            /// CREATE SESSION
-            buildActionButton(
-              icon: Icons.schedule,
-
-              title: "Create Session",
-
-              onTap: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(builder: (_) => const SessionScreen()),
-                );
-              },
-            ),
-
-            /// BOOKINGS
-            buildActionButton(
-              icon: Icons.assignment,
-
-              title: "Manage Bookings",
-
-              onTap: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(builder: (_) => const BookingsScreen()),
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 }
 
-/// DRAWER ITEM
 Widget buildDrawerItem({
   required IconData icon,
-
   required String title,
-
   required VoidCallback onTap,
-
   Color color = Colors.black87,
 }) {
   return ListTile(
     leading: Icon(icon, color: color),
-
     title: Text(title, style: TextStyle(color: color)),
-
     onTap: onTap,
   );
 }
 
-/// ACTION BUTTON
 Widget buildActionButton({
   required IconData icon,
-
   required String title,
-
   required VoidCallback onTap,
 }) {
   return Container(
     margin: const EdgeInsets.only(bottom: 15),
-
     child: ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF1565C0),
-
         minimumSize: const Size(double.infinity, 60),
-
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
-
       onPressed: onTap,
-
       icon: Icon(icon, color: Colors.white),
-
       label: Text(
         title,
-
         style: const TextStyle(
           color: Colors.white,
-
           fontSize: 16,
-
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -475,55 +422,196 @@ Widget buildActionButton({
   );
 }
 
-/// DASHBOARD CARD
-class DashboardCard extends StatelessWidget {
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title, required this.subtitle});
+
   final String title;
-  final String value;
-  final IconData icon;
-
-  const DashboardCard({
-    super.key,
-
-    required this.title,
-
-    required this.value,
-
-    required this.icon,
-  });
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+        ),
+      ],
+    );
+  }
+}
 
-      decoration: BoxDecoration(
+class QuickActionCard extends StatelessWidget {
+  const QuickActionCard({
+    super.key,
+    required this.width,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.onTap,
+  });
+
+  final double width;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Material(
         color: Colors.white,
-
-        borderRadius: BorderRadius.circular(22),
-
-        boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 10)],
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: accent.withValues(alpha: 0.10)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade200,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: accent),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: Colors.grey.shade400),
+              ],
+            ),
+          ),
+        ),
       ),
+    );
+  }
+}
 
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+class DashboardCard extends StatelessWidget {
+  const DashboardCard({
+    super.key,
+    required this.width,
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.onTap,
+  });
 
-        children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFFE3F2FD),
+  final double width;
+  final String title;
+  final String value;
+  final IconData icon;
+  final VoidCallback onTap;
 
-            child: Icon(icon, color: const Color(0xFF1565C0)),
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: const Color(0xFF1565C0).withValues(alpha: 0.08),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade200,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE3F2FD),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF1565C0)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-
-          const Spacer(),
-
-          Text(
-            value,
-
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-          ),
-
-          Text(title, style: const TextStyle(color: Colors.grey)),
-        ],
+        ),
       ),
     );
   }
