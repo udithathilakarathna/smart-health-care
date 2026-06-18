@@ -4,6 +4,7 @@ import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
 import 'appointment_history_screen.dart';
+import 'profile_screen.dart';
 
 
 class PatientDashboard extends StatelessWidget {
@@ -136,7 +137,13 @@ class PatientDashboard extends StatelessWidget {
               leading: const Icon(Icons.person),
               title: const Text("Profile"),
               onTap: () {
-
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                    const ProfileScreen(),
+                  ),
+                );
               },
             ),
             const Spacer(),
@@ -194,7 +201,7 @@ class PatientDashboard extends StatelessWidget {
                 children: [
 
                   Text(
-                    "Welcome Patient 👋",
+                    "Welcome 👋",
                     style: const TextStyle(
                       color: Colors.white70,
                     ),
