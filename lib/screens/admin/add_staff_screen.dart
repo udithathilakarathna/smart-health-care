@@ -10,6 +10,11 @@ class AddStaffScreen extends StatefulWidget {
 }
 
 class _AddStaffScreenState extends State<AddStaffScreen> {
+  static const String _pharmacistFullName = 'Pharmacist Demo';
+  static const String _pharmacistPhone = '0770000000';
+  static const String _pharmacistEmail = 'pharmacist@smartcare.com';
+  static const String _pharmacistPassword = 'Pharmacist@123';
+
   final TextEditingController staffNameController = TextEditingController();
 
   final TextEditingController phoneController = TextEditingController();
@@ -35,10 +40,23 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
 
   /// SAVE STAFF
   Future<void> saveStaff() async {
-    if (staffNameController.text.isEmpty ||
-        phoneController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
+    final isPharmacist = selectedRole == 'Pharmacist';
+
+    final staffName = isPharmacist
+        ? _pharmacistFullName
+        : staffNameController.text.trim();
+    final phoneNumber = isPharmacist
+        ? _pharmacistPhone
+        : phoneController.text.trim();
+    final email = isPharmacist ? _pharmacistEmail : emailController.text.trim();
+    final password = isPharmacist
+        ? _pharmacistPassword
+        : passwordController.text.trim();
+
+    if (staffName.isEmpty ||
+        phoneNumber.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
@@ -53,21 +71,17 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
 
       /// CREATE AUTH USER
       UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: emailController.text.trim(),
-
-            password: passwordController.text.trim(),
-          );
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       String uid = userCredential.user!.uid;
 
       /// SAVE FIRESTORE
       await FirebaseFirestore.instance.collection("users").doc(uid).set({
-        "fullName": staffNameController.text.trim(),
+        "fullName": staffName,
 
-        "phone": phoneController.text.trim(),
+        "phone": phoneNumber,
 
-        "email": emailController.text.trim(),
+        "email": email,
 
         "roleType": selectedRole,
 
@@ -76,16 +90,28 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
         "createdAt": Timestamp.now(),
       });
 
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Staff Added Successfully")));
 
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.message ?? "Error")));
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
@@ -181,7 +207,7 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
               ),
 
               child: DropdownButtonFormField<String>(
-                value: selectedRole,
+                initialValue: selectedRole,
 
                 decoration: const InputDecoration(border: InputBorder.none),
 
