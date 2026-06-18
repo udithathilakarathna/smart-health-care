@@ -6,40 +6,28 @@ import '../admin/admin_dashboard.dart';
 import 'register_screen.dart';
 import '../patient/patent_dashboard.dart';
 
+import '../doctor/doctor_dashboard_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() =>
-      _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState
-    extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
 
-  final TextEditingController
-  emailController =
-  TextEditingController();
-
-  final TextEditingController
-  passwordController =
-  TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   bool hidePassword = true;
   bool isLoading = false;
 
   Future<void> loginUser() async {
-
-    if (emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content:
-          Text("Please fill all fields"),
-        ),
-      );
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
       return;
     }
 
@@ -48,34 +36,23 @@ class _LoginScreenState
         isLoading = true;
       });
 
-      UserCredential userCredential =
-      await FirebaseAuth.instance
+      UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-        email:
-        emailController.text.trim(),
-        password:
-        passwordController.text.trim(),
-      );
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
-      String uid =
-          userCredential.user!.uid;
+      String uid = userCredential.user!.uid;
 
-      DocumentSnapshot userDoc =
-      await FirebaseFirestore
-          .instance
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection("users")
           .doc(uid)
           .get();
 
       if (!userDoc.exists) {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-                "User data not found"),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("User data not found")));
 
         setState(() {
           isLoading = false;
@@ -84,57 +61,37 @@ class _LoginScreenState
         return;
       }
 
-      String role =
-      userDoc["role"];
+      String role = userDoc["role"];
 
+      print("================================");
+      print("ROLE = $role");
+      print("UID = $uid");
+      print("================================");
 
       /// ADMIN
       if (role == "admin") {
-
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) =>
-            const AdminDashboard(),
-          ),
+          MaterialPageRoute(builder: (_) => const AdminDashboard()),
         );
-
       }
-
       /// DOCTOR
-      else if (role ==
-          "doctor") {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-          const SnackBar(
-            content: Text(
-                "Doctor dashboard coming soon"),
-          ),
-        );
-      }
-
-
-      else if (role == "patient") {
-
+      else if (role == "doctor") {
+        print("DOCTOR DASHBOARD OPENING");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const PatientDashboard(),
-          ),
+          MaterialPageRoute(builder: (_) => const DoctorDashboardScreen()),
+        );
+      } else if (role == "patient") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const PatientDashboard()),
         );
       }
-
     } on FirebaseAuthException catch (e) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content:
-          Text(e.message ??
-              "Login Failed"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? "Login Failed")));
     }
 
     setState(() {
@@ -145,24 +102,20 @@ class _LoginScreenState
   Widget buildTextField({
     required String hint,
     required IconData icon,
-    required TextEditingController
-    controller,
+    required TextEditingController controller,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-        BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey
-                .withValues(alpha: 0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             blurRadius: 12,
             spreadRadius: 2,
-          )
+          ),
         ],
       ),
       child: TextField(
@@ -170,17 +123,10 @@ class _LoginScreenState
         obscureText: obscureText,
         decoration: InputDecoration(
           hintText: hint,
-          prefixIcon: Icon(
-            icon,
-            color:
-            const Color(0xFF1565C0),
-          ),
+          prefixIcon: Icon(icon, color: const Color(0xFF1565C0)),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
-          contentPadding:
-          const EdgeInsets.symmetric(
-            vertical: 20,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 20),
         ),
       ),
     );
@@ -188,58 +134,36 @@ class _LoginScreenState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor:
-      const Color(0xFFF4F8FC),
+      backgroundColor: const Color(0xFFF4F8FC),
 
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-
               /// HEADER
               Container(
                 width: double.infinity,
-                padding:
-                const EdgeInsets.only(
-                  top: 50,
-                  bottom: 45,
-                ),
-                decoration:
-                const BoxDecoration(
-                  gradient:
-                  LinearGradient(
-                    colors: [
-                      Color(0xFF1565C0),
-                      Color(0xFF42A5F5),
-                    ],
-                    begin:
-                    Alignment.topLeft,
-                    end: Alignment
-                        .bottomRight,
+                padding: const EdgeInsets.only(top: 50, bottom: 45),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  borderRadius:
-                  BorderRadius.only(
-                    bottomLeft:
-                    Radius.circular(
-                        35),
-                    bottomRight:
-                    Radius.circular(
-                        35),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(35),
+                    bottomRight: Radius.circular(35),
                   ),
                 ),
                 child: const Column(
                   children: [
-
                     CircleAvatar(
                       radius: 40,
-                      backgroundColor:
-                      Colors.white,
+                      backgroundColor: Colors.white,
                       child: Icon(
                         Icons.local_hospital,
-                        color: Color(
-                            0xFF1565C0),
+                        color: Color(0xFF1565C0),
                         size: 45,
                       ),
                     ),
@@ -249,11 +173,9 @@ class _LoginScreenState
                     Text(
                       "Welcome Back",
                       style: TextStyle(
-                        color:
-                        Colors.white,
+                        color: Colors.white,
                         fontSize: 30,
-                        fontWeight:
-                        FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
 
@@ -261,166 +183,108 @@ class _LoginScreenState
 
                     Text(
                       "Access your healthcare account",
-                      style: TextStyle(
-                        color:
-                        Colors.white70,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
                     ),
                   ],
                 ),
               ),
 
               Padding(
-                padding:
-                const EdgeInsets.all(
-                    24),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-
-                    const SizedBox(
-                        height: 20),
+                    const SizedBox(height: 20),
 
                     buildTextField(
                       hint: "Email",
-                      icon:
-                      Icons.email,
-                      controller:
-                      emailController,
+                      icon: Icons.email,
+                      controller: emailController,
                     ),
 
-                    const SizedBox(
-                        height: 20),
+                    const SizedBox(height: 20),
 
                     buildTextField(
-                      hint:
-                      "Password",
-                      icon:
-                      Icons.lock,
-                      controller:
-                      passwordController,
-                      obscureText:
-                      hidePassword,
-                      suffixIcon:
-                      IconButton(
+                      hint: "Password",
+                      icon: Icons.lock,
+                      controller: passwordController,
+                      obscureText: hidePassword,
+                      suffixIcon: IconButton(
                         icon: Icon(
                           hidePassword
-                              ? Icons
-                              .visibility_off
-                              : Icons
-                              .visibility,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         onPressed: () {
                           setState(() {
-                            hidePassword =
-                            !hidePassword;
+                            hidePassword = !hidePassword;
                           });
                         },
                       ),
                     ),
 
                     Align(
-                      alignment:
-                      Alignment
-                          .centerRight,
-                      child:
-                      TextButton(
-                        onPressed:
-                            () {},
-                        child:
-                        const Text(
-                          "Forgot Password?",
-                        ),
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {},
+                        child: const Text("Forgot Password?"),
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 15),
+                    const SizedBox(height: 15),
 
                     SizedBox(
                       width: double.infinity,
                       height: 58,
-                      child:
-                      ElevatedButton(
-                        onPressed:
-                        isLoading
-                            ? null
-                            : loginUser,
-                        style:
-                        ElevatedButton
-                            .styleFrom(
-                          backgroundColor:
-                          const Color(
-                              0xFF1565C0),
-                          shape:
-                          RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(
-                                18),
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : loginUser,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1565C0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
                           ),
                           elevation: 6,
                         ),
                         child: isLoading
                             ? const CircularProgressIndicator(
-                          color:
-                          Colors.white,
-                        )
+                                color: Colors.white,
+                              )
                             : const Text(
-                          "Login",
-                          style:
-                          TextStyle(
-                            fontSize:
-                            18,
-                            color:
-                            Colors.white,
-                            fontWeight:
-                            FontWeight.bold,
-                          ),
-                        ),
+                                "Login",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
 
-                    const SizedBox(
-                        height: 25),
+                    const SizedBox(height: 25),
 
                     Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment
-                          .center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
-                        const Text(
-                          "Don't have an account?",
-                        ),
+                        const Text("Don't have an account?"),
 
                         TextButton(
-                          onPressed:
-                              () {
-
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (_) =>
-                                const RegisterScreen(),
+                                builder: (_) => const RegisterScreen(),
                               ),
                             );
                           },
-                          child:
-                          const Text(
+                          child: const Text(
                             "Register",
-                            style:
-                            TextStyle(
-                              fontWeight:
-                              FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
