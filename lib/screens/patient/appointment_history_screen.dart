@@ -2,150 +2,99 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'patent_dashboard.dart';
+import '../../widgets/smart_back_button.dart';
+
 class AppointmentHistoryScreen extends StatelessWidget {
   const AppointmentHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-    String patientId =
-        FirebaseAuth.instance.currentUser!.uid;
+    String patientId = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8FC),
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF1565C0),
+        leading: SmartBackButton(
+          fallbackPageBuilder: (_) => const PatientDashboard(),
+        ),
         title: const Text(
           "Appointment History",
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
       ),
 
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("appointments")
-            .where(
-          "patientId",
-          isEqualTo: patientId,
-        )
+            .where("patientId", isEqualTo: patientId)
             .snapshots(),
 
         builder: (context, snapshot) {
-
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child:
-              CircularProgressIndicator(),
-            );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData ||
-              snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text(
-                "No Appointments Found",
-              ),
-            );
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No Appointments Found"));
           }
 
-          var appointments =
-              snapshot.data!.docs;
+          var appointments = snapshot.data!.docs;
 
           return ListView.builder(
-            padding:
-            const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
 
-            itemCount:
-            appointments.length,
+            itemCount: appointments.length,
 
-            itemBuilder:
-                (context, index) {
-
-              var appointment =
-              appointments[index];
+            itemBuilder: (context, index) {
+              var appointment = appointments[index];
 
               return Container(
-                margin:
-                const EdgeInsets.only(
-                  bottom: 15,
-                ),
+                margin: const EdgeInsets.only(bottom: 15),
 
-                padding:
-                const EdgeInsets.all(
-                  16,
-                ),
+                padding: const EdgeInsets.all(16),
 
-                decoration:
-                BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius:
-                  BorderRadius.circular(
-                      20),
+                  borderRadius: BorderRadius.circular(20),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors
-                          .grey.shade200,
-                      blurRadius: 8,
-                    ),
+                    BoxShadow(color: Colors.grey.shade200, blurRadius: 8),
                   ],
                 ),
 
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-
                     Row(
                       children: [
-
                         CircleAvatar(
-                          backgroundColor:
-                          Colors.blue
-                              .shade50,
+                          backgroundColor: Colors.blue.shade50,
                           child: const Icon(
-                            Icons
-                                .local_hospital,
-                            color:
-                            Colors.blue,
+                            Icons.local_hospital,
+                            color: Colors.blue,
                           ),
                         ),
 
-                        const SizedBox(
-                            width: 12),
+                        const SizedBox(width: 12),
 
                         Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-
                               Text(
                                 "Dr. ${appointment["doctorName"]}",
-                                style:
-                                const TextStyle(
-                                  fontSize:
-                                  18,
-                                  fontWeight:
-                                  FontWeight
-                                      .bold,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
 
                               Text(
-                                appointment[
-                                "status"],
-                                style:
-                                const TextStyle(
-                                  color: Colors
-                                      .green,
-                                ),
+                                appointment["status"],
+                                style: const TextStyle(color: Colors.green),
                               ),
                             ],
                           ),
@@ -153,24 +102,15 @@ class AppointmentHistoryScreen extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(
-                        height: 15),
+                    const SizedBox(height: 15),
 
-                    Text(
-                      "📅 Date : ${appointment["sessionDate"]}",
-                    ),
+                    Text("📅 Date : ${appointment["sessionDate"]}"),
 
-                    Text(
-                      "⏰ Time : ${appointment["sessionTime"]}",
-                    ),
+                    Text("⏰ Time : ${appointment["sessionTime"]}"),
 
-                    Text(
-                      "🏥 Room : ${appointment["roomNumber"]}",
-                    ),
+                    Text("🏥 Room : ${appointment["roomNumber"]}"),
 
-                    Text(
-                      "💰 Fee : Rs. ${appointment["channelFee"]}",
-                    ),
+                    Text("💰 Fee : Rs. ${appointment["channelFee"]}"),
                   ],
                 ),
               );

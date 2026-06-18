@@ -7,6 +7,7 @@ import 'register_screen.dart';
 import '../patient/patent_dashboard.dart';
 
 import '../doctor/doctor_dashboard_screen.dart';
+import '../pharmacist/pharmacist_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -62,6 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       String role = userDoc["role"];
+      String roleType = userDoc.data().toString().contains("roleType")
+          ? userDoc["roleType"]
+          : "";
 
       print("================================");
       print("ROLE = $role");
@@ -81,6 +85,11 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const DoctorDashboardScreen()),
+        );
+      } else if (role == "staff" && roleType == "Pharmacist") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const PharmacistDashboardScreen()),
         );
       } else if (role == "patient") {
         Navigator.pushReplacement(
