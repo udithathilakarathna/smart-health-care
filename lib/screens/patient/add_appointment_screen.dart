@@ -387,17 +387,42 @@ class _AddAppointmentScreenState
                                             if (bookingCount >= maxAppointments) {
                                               status = "Not Available";
                                             }
+                                            String bookingNumber =
+                                                "BK${DateTime.now().millisecondsSinceEpoch}";
 
+                                            var doctorDoc =
+                                            await FirebaseFirestore.instance
+                                                .collection("users")
+                                                .where(
+                                              "fullName",
+                                              isEqualTo: session["doctorName"],
+                                            )
+                                                .limit(1)
+                                                .get();
+
+                                            String specialization =
+                                            doctorDoc.docs.first["specialization"];
+
+                                            String doctorId =
+                                                doctorDoc.docs.first.id;
                                             // Save Appointment
                                             await FirebaseFirestore.instance
                                                 .collection("appointments")
                                                 .add({
+                                              "bookingNumber":
+                                              bookingNumber,
 
                                               "patientId":
                                               FirebaseAuth.instance.currentUser!.uid,
 
+                                              "doctorId":
+                                              doctorId,
+
                                               "doctorName":
                                               session["doctorName"],
+
+                                              "specialization":
+                                              specialization,
 
                                               "sessionId":
                                               sessionId,
