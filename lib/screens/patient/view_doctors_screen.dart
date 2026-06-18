@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'add_appointment_screen.dart';
 import 'patent_dashboard.dart';
 import '../../widgets/smart_back_button.dart';
 
@@ -198,6 +199,33 @@ class _ViewDoctorsScreenState extends State<ViewDoctorsScreen> {
                                   ),
                                 ],
                               ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1565C0),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AddAppointmentScreen(
+                                      initialDoctorName: doctor["fullName"],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Text('Book'),
                             ),
                           ],
                         ),

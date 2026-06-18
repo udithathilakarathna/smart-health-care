@@ -6,7 +6,9 @@ import 'patent_dashboard.dart';
 import '../../widgets/smart_back_button.dart';
 
 class AddAppointmentScreen extends StatefulWidget {
-  const AddAppointmentScreen({super.key});
+  const AddAppointmentScreen({super.key, this.initialDoctorName});
+
+  final String? initialDoctorName;
 
   @override
   State<AddAppointmentScreen> createState() => _AddAppointmentScreenState();
@@ -14,6 +16,12 @@ class AddAppointmentScreen extends StatefulWidget {
 
 class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
   String? selectedDoctor;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDoctor = widget.initialDoctorName;
+  }
 
   @override
   Widget build(BuildContext context) {

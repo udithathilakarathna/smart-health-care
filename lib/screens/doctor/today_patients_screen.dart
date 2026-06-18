@@ -56,15 +56,19 @@ class TodayPatientsScreen extends StatelessWidget {
                 return const SizedBox.shrink();
               }
 
-              final appointments = snapshot.data!.docs.where((doc) {
-                final appointmentDate = parseSessionDate(
-                  doc.data()['sessionDate'] as String?,
-                );
-                return appointmentDate != null &&
-                    isSameDay(appointmentDate, today);
-              }).toList();
+              final appointments = uniqueAppointmentsByPatient(
+                snapshot.data!.docs.where((doc) {
+                  final appointmentDate = parseSessionDate(
+                    doc.data()['sessionDate'] as String?,
+                  );
+                  return appointmentDate != null &&
+                      isSameDay(appointmentDate, today);
+                }),
+              );
 
-              appointments.sort((first, second) {
+              final sortedAppointments = appointments.toList();
+
+              sortedAppointments.sort((first, second) {
                 final firstToken =
                     (first.data()['tokenNumber'] as num?)?.toInt() ?? 0;
                 final secondToken =
@@ -72,7 +76,7 @@ class TodayPatientsScreen extends StatelessWidget {
                 return firstToken.compareTo(secondToken);
               });
 
-              if (appointments.isEmpty) {
+              if (sortedAppointments.isEmpty) {
                 return const Center(
                   child: Text('No patients scheduled for today'),
                 );
@@ -80,9 +84,9 @@ class TodayPatientsScreen extends StatelessWidget {
 
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount: appointments.length,
+                itemCount: sortedAppointments.length,
                 itemBuilder: (context, index) {
-                  final appointment = appointments[index];
+                  final appointment = sortedAppointments[index];
                   final data = appointment.data();
                   final token =
                       (data['tokenNumber'] as num?)?.toInt() ?? index + 1;

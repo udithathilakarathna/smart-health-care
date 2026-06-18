@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../auth/login_screen.dart';
@@ -239,67 +240,114 @@ class AdminDashboard extends StatelessWidget {
                   subtitle: 'Tap a card to open full details',
                 ),
                 const SizedBox(height: 12),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    DashboardCard(
-                      width: cardWidth,
-                      title: 'Doctors',
-                      value: '15',
-                      icon: Icons.local_hospital,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const DoctorsScreen(),
-                          ),
+                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .where('role', isEqualTo: 'doctor')
+                      .snapshots(),
+                  builder: (context, doctorSnapshot) {
+                    final doctorCount = doctorSnapshot.data?.docs.length ?? 0;
+
+                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .where('role', isEqualTo: 'staff')
+                          .snapshots(),
+                      builder: (context, staffSnapshot) {
+                        final staffCount = staffSnapshot.data?.docs.length ?? 0;
+
+                        return StreamBuilder<
+                          QuerySnapshot<Map<String, dynamic>>
+                        >(
+                          stream: FirebaseFirestore.instance
+                              .collection('sessions')
+                              .snapshots(),
+                          builder: (context, sessionSnapshot) {
+                            final sessionCount =
+                                sessionSnapshot.data?.docs.length ?? 0;
+
+                            return StreamBuilder<
+                              QuerySnapshot<Map<String, dynamic>>
+                            >(
+                              stream: FirebaseFirestore.instance
+                                  .collection('appointments')
+                                  .snapshots(),
+                              builder: (context, bookingSnapshot) {
+                                final bookingCount =
+                                    bookingSnapshot.data?.docs.length ?? 0;
+
+                                return Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  children: [
+                                    DashboardCard(
+                                      width: cardWidth,
+                                      title: 'Doctors',
+                                      value: doctorCount.toString(),
+                                      icon: Icons.local_hospital,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const DoctorsScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    DashboardCard(
+                                      width: cardWidth,
+                                      title: 'Staff',
+                                      value: staffCount.toString(),
+                                      icon: Icons.people,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const StaffScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    DashboardCard(
+                                      width: cardWidth,
+                                      title: 'Sessions',
+                                      value: sessionCount.toString(),
+                                      icon: Icons.schedule,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const SessionScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    DashboardCard(
+                                      width: cardWidth,
+                                      title: 'Bookings',
+                                      value: bookingCount.toString(),
+                                      icon: Icons.person,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const BookingsScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         );
                       },
-                    ),
-                    DashboardCard(
-                      width: cardWidth,
-                      title: 'Staff',
-                      value: '8',
-                      icon: Icons.people,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const StaffScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    DashboardCard(
-                      width: cardWidth,
-                      title: 'Sessions',
-                      value: '25',
-                      icon: Icons.schedule,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const SessionScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    DashboardCard(
-                      width: cardWidth,
-                      title: 'Patients',
-                      value: '120',
-                      icon: Icons.person,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const PatientsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
                 const _SectionHeader(

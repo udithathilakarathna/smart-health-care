@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 DateTime? parseSessionDate(String? value) {
   if (value == null || value.trim().isEmpty) {
     return null;
@@ -68,4 +70,35 @@ DateTime? appointmentDateTime(Map<String, dynamic> data) {
 
 String formatDateKey(DateTime dateTime) {
   return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+}
+
+List<QueryDocumentSnapshot<Map<String, dynamic>>> uniqueAppointmentsByPatient(
+  Iterable<QueryDocumentSnapshot<Map<String, dynamic>>> appointments,
+) {
+  final uniqueByPatient =
+      <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
+
+  for (final appointment in appointments) {
+    final data = appointment.data();
+    final patientKey = (data['patientId'] as String?)?.trim().isNotEmpty == true
+        ? (data['patientId'] as String).trim()
+        : (data['patientName'] as String?)?.trim().isNotEmpty == true
+        ? (data['patientName'] as String).trim()
+        : appointment.id;
+
+    final existing = uniqueByPatient[patientKey];
+    if (existing == null) {
+      uniqueByPatient[patientKey] = appointment;
+      continue;
+    }
+
+    final currentToken = (existing.data()['tokenNumber'] as num?)?.toInt() ?? 0;
+    final nextToken = (data['tokenNumber'] as num?)?.toInt() ?? 0;
+
+    if (nextToken < currentToken) {
+      uniqueByPatient[patientKey] = appointment;
+    }
+  }
+
+  return uniqueByPatient.values.toList();
 }
