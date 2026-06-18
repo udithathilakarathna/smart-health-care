@@ -156,6 +156,27 @@ class AppointmentHistoryScreen extends StatelessWidget {
                     const SizedBox(
                         height: 15),
 
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        "Booking ID : ${appointment["bookingNumber"]}",
+                        style: const TextStyle(
+                          color: Color(0xFF1565C0),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
                     Text(
                       "📅 Date : ${appointment["sessionDate"]}",
                     ),
