@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'doctor_prescriptions_screen.dart';
 import 'today_patients_screen.dart';
-import 'upcoming_patients_screen.dart';
 
 class DoctorDashboardScreen extends StatelessWidget {
   const DoctorDashboardScreen({super.key});
@@ -75,26 +74,6 @@ class DoctorDashboardScreen extends StatelessWidget {
                                         '${today.day}/${today.month}/${today.year}';
                               }).length;
 
-                              final upcomingCount = appointments.where((doc) {
-                                final sessionDate =
-                                    doc.data()['sessionDate'] as String?;
-                                if (sessionDate == null) {
-                                  return false;
-                                }
-                                final parts = sessionDate.split('/');
-                                if (parts.length != 3) {
-                                  return false;
-                                }
-                                final day = int.tryParse(parts[0]) ?? 0;
-                                final month = int.tryParse(parts[1]) ?? 0;
-                                final year = int.tryParse(parts[2]) ?? 0;
-                                final parsed = DateTime(year, month, day);
-                                return parsed.isAfter(today) &&
-                                    !(parsed.year == today.year &&
-                                        parsed.month == today.month &&
-                                        parsed.day == today.day);
-                              }).length;
-
                               return Column(
                                 children: [
                                   Row(
@@ -105,15 +84,6 @@ class DoctorDashboardScreen extends StatelessWidget {
                                           value: todayCount.toString(),
                                           icon: Icons.today,
                                           tint: const Color(0xFF1565C0),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: _StatCard(
-                                          label: 'Upcoming',
-                                          value: upcomingCount.toString(),
-                                          icon: Icons.schedule,
-                                          tint: const Color(0xFF1C7C54),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
@@ -178,21 +148,6 @@ class DoctorDashboardScreen extends StatelessWidget {
                                             MaterialPageRoute(
                                               builder: (_) =>
                                                   const TodayPatientsScreen(),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      _DashboardCard(
-                                        title: 'Upcoming Patients',
-                                        subtitle: 'Next sessions',
-                                        icon: Icons.schedule,
-                                        tint: const Color(0xFF1C7C54),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  const UpcomingPatientsScreen(),
                                             ),
                                           );
                                         },
@@ -334,11 +289,6 @@ class _DoctorMenu extends StatelessWidget {
                 icon: Icons.today,
                 label: 'Today Patients',
                 onTap: () => _openPage(context, const TodayPatientsScreen()),
-              ),
-              _MenuTile(
-                icon: Icons.schedule,
-                label: 'Upcoming Patients',
-                onTap: () => _openPage(context, const UpcomingPatientsScreen()),
               ),
               _MenuTile(
                 icon: Icons.medication,
