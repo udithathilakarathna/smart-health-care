@@ -4,7 +4,7 @@ import 'view_doctors_screen.dart';
 import '../auth/login_screen.dart';
 import 'add_appointment_screen.dart';
 import 'appointment_history_screen.dart';
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
 import 'profile_screen.dart';
 
 
@@ -13,13 +13,13 @@ class PatientDashboard extends StatelessWidget {
   const PatientDashboard({
     super.key,
   });
-=======
+=========
 import 'my_prescriptions_screen.dart';
 import 'patient_profile_screen.dart';
 
 class PatientDashboard extends StatelessWidget {
   const PatientDashboard({super.key});
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
 
   @override
   Widget build(BuildContext context) {
@@ -135,10 +135,7 @@ class PatientDashboard extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                    const ProfileScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
                 );
               },
             ),
@@ -178,7 +175,7 @@ class PatientDashboard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
                 borderRadius:
                 BorderRadius.circular(20),
               ),
@@ -192,7 +189,7 @@ class PatientDashboard extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white70,
                     ),
-=======
+=========
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -208,7 +205,7 @@ class PatientDashboard extends StatelessWidget {
                   Text(
                     "Smart Care for your health journey",
                     style: TextStyle(color: Colors.white70),
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
                   ),
                   SizedBox(height: 8),
                   Text(

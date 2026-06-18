@@ -103,6 +103,7 @@ class AppointmentHistoryScreen extends StatelessWidget {
                     ),
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     const SizedBox(
                         height: 15),
                     Container(
@@ -126,6 +127,9 @@ class AppointmentHistoryScreen extends StatelessWidget {
 =======
                     const SizedBox(height: 15),
 >>>>>>> feature/pharmacist-role
+=======
+                    const SizedBox(height: 15),
+>>>>>>> 242b370304efe757dbc456b7774f89740b5d6732
 
                     Text("📅 Date : ${appointment["sessionDate"]}"),
 

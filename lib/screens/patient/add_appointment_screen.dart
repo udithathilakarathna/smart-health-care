@@ -118,7 +118,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             const SizedBox(height: 20),
 
             /// SESSION LIST
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: selectedDoctor == null
@@ -132,7 +132,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                 isEqualTo: selectedDoctor,
               )
                   .snapshots(),
-=======
+=========
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: selectedDoctor == null
@@ -145,7 +145,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                           .where("status", isEqualTo: "Available")
                           .where("doctorName", isEqualTo: selectedDoctor)
                           .snapshots(),
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
 
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -268,13 +268,13 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                               ),
                             ),
 
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
                               onPressed: availableSlots == 0
                                   ? null
                                   : () {
-=======
+=========
                             const SizedBox(height: 15),
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
 
                             SizedBox(
                               width: double.infinity,
@@ -332,7 +332,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                               int bookingCount =
                                                   session["bookingCount"];
 
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
                                             if (bookingCount >= maxAppointments) {
                                               status = "Not Available";
                                             }
@@ -369,16 +369,16 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                                 .add({
                                               "bookingNumber":
                                               bookingNumber,
-=======
+=========
                                               int maxAppointments =
                                                   session["maxAppointments"];
 
                                               bookingCount++;
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
 
                                               String status = "Available";
 
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
                                               "doctorId":
                                               doctorId,
 
@@ -390,7 +390,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
 
                                               "sessionId":
                                               sessionId,
-=======
+=========
                                               if (bookingCount >=
                                                   maxAppointments) {
                                                 status = "Not Available";
@@ -401,7 +401,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                                   .collection("appointments")
                                                   .add({
                                                     "patientId": patientId,
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
 
                                                     "patientName": patientName,
 
@@ -458,7 +458,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                             },
                                             child: const Text("Confirm"),
                                           ),
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
                                         ),
                                       ],
                                     );
@@ -471,7 +471,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                     : "Book Appointment",
                                 style: const TextStyle(
                                   color: Colors.white,
-=======
+=========
                                         ],
                                       );
                                     },
@@ -481,7 +481,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                 child: const Text(
                                   "Book Appointment",
                                   style: TextStyle(color: Colors.white),
->>>>>>> feature/pharmacist-role
+>>>>>>>>> Temporary merge branch 2
                                 ),
                               ),
                             ),
