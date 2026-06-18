@@ -8,6 +8,21 @@ import '../../widgets/smart_back_button.dart';
 class AppointmentHistoryScreen extends StatelessWidget {
   const AppointmentHistoryScreen({super.key});
 
+  String _bookingIdFor(DocumentSnapshot appointment) {
+    final data = appointment.data() as Map<String, dynamic>?;
+    final bookingNumber = data?['bookingNumber'];
+    if (bookingNumber != null && bookingNumber.toString().trim().isNotEmpty) {
+      return bookingNumber.toString();
+    }
+
+    final tokenNumber = data?['tokenNumber'];
+    if (tokenNumber != null && tokenNumber.toString().trim().isNotEmpty) {
+      return 'Token ${tokenNumber.toString()}';
+    }
+
+    return '-';
+  }
+
   @override
   Widget build(BuildContext context) {
     String patientId = FirebaseAuth.instance.currentUser!.uid;
@@ -107,7 +122,7 @@ class AppointmentHistoryScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        "Booking ID : ${appointment["bookingNumber"]}",
+                        "Booking ID : ${_bookingIdFor(appointment)}",
                         style: const TextStyle(
                           color: Color(0xFF1565C0),
                           fontWeight: FontWeight.bold,

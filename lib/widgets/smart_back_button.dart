@@ -17,8 +17,9 @@ class SmartBackButton extends StatelessWidget {
           return;
         }
 
-        navigator.pushReplacement(
+        navigator.pushAndRemoveUntil(
           MaterialPageRoute(builder: fallbackPageBuilder),
+          (route) => false,
         );
       },
     );
