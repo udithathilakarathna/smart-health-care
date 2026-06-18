@@ -319,7 +319,16 @@ class _DoctorMenu extends StatelessWidget {
                 icon: Icons.dashboard,
                 label: 'Dashboard',
                 selected: true,
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DoctorDashboardScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
               ),
               _MenuTile(
                 icon: Icons.today,
