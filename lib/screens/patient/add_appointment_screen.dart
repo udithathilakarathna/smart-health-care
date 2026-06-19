@@ -37,8 +37,8 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
   }
 
   Future<QueryDocumentSnapshot<Map<String, dynamic>>?> _fetchDoctorDoc(
-    String doctorName,
-  ) async {
+      String doctorName,
+      ) async {
     final doctorQuery = await FirebaseFirestore.instance
         .collection('users')
         .where('fullName', isEqualTo: _normalizeDoctorLabel(doctorName))
@@ -113,33 +113,32 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             const SizedBox(height: 20),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: selectedDoctor == null
-                    ? FirebaseFirestore.instance
-                    .collection('sessions')
-                    .where('status', isEqualTo: 'Available')
-                    .snapshots()
-                    : FirebaseFirestore.instance
-                    .collection('sessions')
-                    .where('status', isEqualTo: 'Available')
-                    .where('doctorName', isEqualTo: selectedDoctor)
+                stream: FirebaseFirestore.instance
+                    .collection('appointments')
+                    .where('patientId', isEqualTo: patientId)
                     .snapshots(),
                 builder: (context, appointmentSnapshot) {
                   if (!appointmentSnapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
+                  final bookedSessionIds = appointmentSnapshot.data!.docs
+                      .map((doc) => doc.data() as Map<String, dynamic>)
+                      .map((data) => data['sessionId']?.toString().trim() ?? '')
+                      .where((id) => id.isNotEmpty)
+                      .toSet();
 
                   return StreamBuilder<QuerySnapshot>(
                     stream: selectedDoctor == null
                         ? FirebaseFirestore.instance
-                              .collection('sessions')
-                              .where('status', isEqualTo: 'Available')
-                              .snapshots()
+                        .collection('sessions')
+                        .where('status', isEqualTo: 'Available')
+                        .snapshots()
                         : FirebaseFirestore.instance
-                              .collection('sessions')
-                              .where('status', isEqualTo: 'Available')
-                              .where('doctorName', isEqualTo: selectedDoctor)
-                              .snapshots(),
+                        .collection('sessions')
+                        .where('status', isEqualTo: 'Available')
+                        .where('doctorName', isEqualTo: selectedDoctor)
+                        .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -159,12 +158,12 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                           final session = sessions[index];
                           final bookingCount = session['bookingCount'] as int;
                           final maxAppointments =
-                              session['maxAppointments'] as int;
+                          session['maxAppointments'] as int;
                           final availableSlots = maxAppointments - bookingCount;
                           final doctorName = session['doctorName'].toString();
 
                           return FutureBuilder<
-                            QueryDocumentSnapshot<Map<String, dynamic>>?
+                              QueryDocumentSnapshot<Map<String, dynamic>>?
                           >(
                             future: _fetchDoctorDoc(doctorName),
                             builder: (context, doctorSnapshot) {
@@ -180,8 +179,12 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                               final doctorId = doctorDoc.id;
                               final specialization =
                                   doctorDoc['specialization']?.toString() ?? '';
-
-                              final canBook = availableSlots > 0;
+                              final sessionId = session.id;
+                              final alreadyBooked = bookedSessionIds.contains(
+                                sessionId,
+                              );
+                              final canBook =
+                                  availableSlots > 0 && !alreadyBooked;
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 15),
@@ -208,7 +211,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 'Dr. $doctorName',
@@ -242,9 +245,13 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
-                                      'Available Slots : $availableSlots / $maxAppointments',
-                                      style: const TextStyle(
-                                        color: Colors.green,
+                                      alreadyBooked
+                                          ? 'You already booked this doctor'
+                                          : 'Available Slots : $availableSlots / $maxAppointments',
+                                      style: TextStyle(
+                                        color: alreadyBooked
+                                            ? Colors.orange.shade700
+                                            : Colors.green,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -259,162 +266,200 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                         ),
                                         onPressed: canBook
                                             ? () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (_) {
-                                                    return AlertDialog(
-                                                      title: const Text(
-                                                        'Confirm Appointment',
-                                                      ),
-                                                      content: Text(
-                                                        'Book appointment with Dr. $doctorName ?',
-                                                      ),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                              context,
-                                                            );
-                                                          },
-                                                          child: const Text(
-                                                            'Cancel',
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                  'Confirm Appointment',
+                                                ),
+                                                content: Text(
+                                                  'Book appointment with Dr. $doctorName ?',
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(
+                                                        context,
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                      'Cancel',
+                                                    ),
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      final sessionId =
+                                                          session.id;
+
+                                                      final currentAppointments =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                        'appointments',
+                                                      )
+                                                          .where(
+                                                        'patientId',
+                                                        isEqualTo:
+                                                        patientId,
+                                                      )
+                                                          .get();
+
+                                                      final alreadyBookedSession =
+                                                      currentAppointments.docs.any((
+                                                          doc,
+                                                          ) {
+                                                        final data =
+                                                        doc.data();
+                                                        return data['sessionId']
+                                                            ?.toString()
+                                                            .trim() ==
+                                                            sessionId;
+                                                      });
+
+                                                      if (alreadyBookedSession) {
+                                                        if (context
+                                                            .mounted) {
+                                                          Navigator.pop(
+                                                            context,
+                                                          );
+                                                          _showSnack(
+                                                            'You have already booked this session.',
+                                                          );
+                                                        }
+                                                        return;
+                                                      }
+
+                                                      final patientDoc =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                        'users',
+                                                      )
+                                                          .doc(
+                                                        patientId,
+                                                      )
+                                                          .get();
+
+                                                      final patientName =
+                                                          patientDoc
+                                                              .data()?['fullName']
+                                                          as String? ??
+                                                              'Patient';
+
+                                                      final currentBookingCount =
+                                                      session['bookingCount']
+                                                      as int;
+                                                      final maxAppts =
+                                                      session['maxAppointments']
+                                                      as int;
+
+                                                      var status =
+                                                          'Available';
+                                                      if (currentBookingCount >=
+                                                          maxAppts) {
+                                                        status =
+                                                        'Not Available';
+                                                      }
+
+                                                      final bookings =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                        'appointments',
+                                                      )
+                                                          .get();
+                                                      final nextNumber =
+                                                          bookings
+                                                              .docs
+                                                              .length +
+                                                              1;
+                                                      final bookingNumber =
+                                                          'BK${nextNumber.toString().padLeft(3, '0')}';
+
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                        'appointments',
+                                                      )
+                                                          .add({
+                                                        'bookingNumber':
+                                                        bookingNumber,
+                                                        'patientId':
+                                                        patientId,
+                                                        'patientName':
+                                                        patientName,
+                                                        'doctorId':
+                                                        doctorId,
+                                                        'doctorName':
+                                                        doctorName,
+                                                        'specialization':
+                                                        specialization,
+                                                        'sessionId':
+                                                        sessionId,
+                                                        'sessionDate':
+                                                        session['sessionDate'],
+                                                        'sessionTime':
+                                                        session['sessionTime'],
+                                                        'roomNumber':
+                                                        session['roomNumber'],
+                                                        'channelFee':
+                                                        session['channelFee'],
+                                                        'tokenNumber':
+                                                        currentBookingCount +
+                                                            1,
+                                                        'status':
+                                                        'Booked',
+                                                        'bookingDate':
+                                                        Timestamp.now(),
+                                                      });
+
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                        'sessions',
+                                                      )
+                                                          .doc(sessionId)
+                                                          .update({
+                                                        'bookingCount':
+                                                        currentBookingCount +
+                                                            1,
+                                                        'status':
+                                                        status,
+                                                      });
+
+                                                      if (!context
+                                                          .mounted) {
+                                                        return;
+                                                      }
+
+                                                      Navigator.pop(
+                                                        context,
+                                                      );
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Appointment Booked Successfully',
                                                           ),
                                                         ),
-                                                        ElevatedButton(
-                                                          onPressed: () async {
-                                                            final sessionId =
-                                                                session.id;
-
-
-
-                                                            final patientDoc =
-                                                                await FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                      'users',
-                                                                    )
-                                                                    .doc(
-                                                                      patientId,
-                                                                    )
-                                                                    .get();
-
-                                                            final patientName =
-                                                                patientDoc
-                                                                        .data()?['fullName']
-                                                                    as String? ??
-                                                                'Patient';
-
-                                                            final currentBookingCount =
-                                                                session['bookingCount']
-                                                                    as int;
-                                                            final maxAppts =
-                                                                session['maxAppointments']
-                                                                    as int;
-
-                                                            var status =
-                                                                'Available';
-                                                            if (currentBookingCount >=
-                                                                maxAppts) {
-                                                              status =
-                                                                  'Not Available';
-                                                            }
-
-                                                            final bookings =
-                                                                await FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                      'appointments',
-                                                                    )
-                                                                    .get();
-                                                            final nextNumber =
-                                                                bookings
-                                                                    .docs
-                                                                    .length +
-                                                                1;
-                                                            final bookingNumber =
-                                                                'BK${nextNumber.toString().padLeft(3, '0')}';
-
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                  'appointments',
-                                                                )
-                                                                .add({
-                                                                  'bookingNumber':
-                                                                      bookingNumber,
-                                                                  'patientId':
-                                                                      patientId,
-                                                                  'patientName':
-                                                                      patientName,
-                                                                  'doctorId':
-                                                                      doctorId,
-                                                                  'doctorName':
-                                                                      doctorName,
-                                                                  'specialization':
-                                                                      specialization,
-                                                                  'sessionId':
-                                                                      sessionId,
-                                                                  'sessionDate':
-                                                                      session['sessionDate'],
-                                                                  'sessionTime':
-                                                                      session['sessionTime'],
-                                                                  'roomNumber':
-                                                                      session['roomNumber'],
-                                                                  'channelFee':
-                                                                      session['channelFee'],
-                                                                  'tokenNumber':
-                                                                      currentBookingCount +
-                                                                      1,
-                                                                  'status':
-                                                                      'Booked',
-                                                                  'bookingDate':
-                                                                      Timestamp.now(),
-                                                                });
-
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                  'sessions',
-                                                                )
-                                                                .doc(sessionId)
-                                                                .update({
-                                                                  'bookingCount':
-                                                                      currentBookingCount +
-                                                                      1,
-                                                                  'status':
-                                                                      status,
-                                                                });
-
-                                                            if (!context
-                                                                .mounted) {
-                                                              return;
-                                                            }
-
-                                                            Navigator.pop(
-                                                              context,
-                                                            );
-                                                            ScaffoldMessenger.of(
-                                                              context,
-                                                            ).showSnackBar(
-                                                              const SnackBar(
-                                                                content: Text(
-                                                                  'Appointment Booked Successfully',
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: const Text(
-                                                            'Confirm',
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              }
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                      'Confirm',
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
                                             : null,
                                         child: Text(
-                                          availableSlots == 0
+                                          alreadyBooked
+                                              ? 'Already Booked'
+                                              : availableSlots == 0
                                               ? 'Session Full'
                                               : 'Book Appointment',
                                           style: const TextStyle(
