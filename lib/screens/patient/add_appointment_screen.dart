@@ -113,20 +113,21 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             const SizedBox(height: 20),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('appointments')
-                    .where('patientId', isEqualTo: patientId)
+                stream: selectedDoctor == null
+                    ? FirebaseFirestore.instance
+                    .collection('sessions')
+                    .where('status', isEqualTo: 'Available')
+                    .snapshots()
+                    : FirebaseFirestore.instance
+                    .collection('sessions')
+                    .where('status', isEqualTo: 'Available')
+                    .where('doctorName', isEqualTo: selectedDoctor)
                     .snapshots(),
                 builder: (context, appointmentSnapshot) {
                   if (!appointmentSnapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final bookedDoctorIds = appointmentSnapshot.data!.docs
-                      .map((doc) => doc.data() as Map<String, dynamic>)
-                      .map((data) => data['doctorId']?.toString().trim() ?? '')
-                      .where((id) => id.isNotEmpty)
-                      .toSet();
 
                   return StreamBuilder<QuerySnapshot>(
                     stream: selectedDoctor == null
@@ -179,11 +180,8 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                               final doctorId = doctorDoc.id;
                               final specialization =
                                   doctorDoc['specialization']?.toString() ?? '';
-                              final alreadyBooked = bookedDoctorIds.contains(
-                                doctorId,
-                              );
-                              final canBook =
-                                  availableSlots > 0 && !alreadyBooked;
+
+                              final canBook = availableSlots > 0;
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 15),
@@ -244,13 +242,9 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
-                                      alreadyBooked
-                                          ? 'You already booked this doctor'
-                                          : 'Available Slots : $availableSlots / $maxAppointments',
-                                      style: TextStyle(
-                                        color: alreadyBooked
-                                            ? Colors.orange.shade700
-                                            : Colors.green,
+                                      'Available Slots : $availableSlots / $maxAppointments',
+                                      style: const TextStyle(
+                                        color: Colors.green,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -291,43 +285,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                                             final sessionId =
                                                                 session.id;
 
-                                                            final currentAppointments =
-                                                                await FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                      'appointments',
-                                                                    )
-                                                                    .where(
-                                                                      'patientId',
-                                                                      isEqualTo:
-                                                                          patientId,
-                                                                    )
-                                                                    .get();
 
-                                                            final alreadyBookedDoctor =
-                                                                currentAppointments.docs.any((
-                                                                  doc,
-                                                                ) {
-                                                                  final data =
-                                                                      doc.data();
-                                                                  return data['doctorId']
-                                                                          ?.toString()
-                                                                          .trim() ==
-                                                                      doctorId;
-                                                                });
-
-                                                            if (alreadyBookedDoctor) {
-                                                              if (context
-                                                                  .mounted) {
-                                                                Navigator.pop(
-                                                                  context,
-                                                                );
-                                                                _showSnack(
-                                                                  'You have already booked Dr. $doctorName.',
-                                                                );
-                                                              }
-                                                              return;
-                                                            }
 
                                                             final patientDoc =
                                                                 await FirebaseFirestore
@@ -456,9 +414,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                               }
                                             : null,
                                         child: Text(
-                                          alreadyBooked
-                                              ? 'Already Booked'
-                                              : availableSlots == 0
+                                          availableSlots == 0
                                               ? 'Session Full'
                                               : 'Book Appointment',
                                           style: const TextStyle(
