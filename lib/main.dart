@@ -7,13 +7,13 @@ Future<void> main() async {
 
   await Firebase.initializeApp(
     options: const FirebaseOptions(
-        apiKey: "AIzaSyCnomUd4b7gBlfKVP_yE9D4cW1C-EAuKYU",
-        authDomain: "smartcare-9b158.firebaseapp.com",
-        projectId: "smartcare-9b158",
-        storageBucket: "smartcare-9b158.firebasestorage.app",
-        messagingSenderId: "959563853786",
-        appId: "1:959563853786:web:9b43f53f4d9c7c59705ae3",
-        measurementId: "G-LFHV4MWQXB"
+      apiKey: "AIzaSyCnomUd4b7gBlfKVP_yE9D4cW1C-EAuKYU",
+      authDomain: "smartcare-9b158.firebaseapp.com",
+      projectId: "smartcare-9b158",
+      storageBucket: "smartcare-9b158.firebasestorage.app",
+      messagingSenderId: "959563853786",
+      appId: "1:959563853786:web:9b43f53f4d9c7c59705ae3",
+      measurementId: "G-LFHV4MWQXB",
     ),
   );
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Smart Care',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
@@ -66,9 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'You have pushed the button this many times:',
-            ),
+            const Text('You have pushed the button this many times:'),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,

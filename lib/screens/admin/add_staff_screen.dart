@@ -6,37 +6,29 @@ class AddStaffScreen extends StatefulWidget {
   const AddStaffScreen({super.key});
 
   @override
-  State<AddStaffScreen> createState() =>
-      _AddStaffScreenState();
+  State<AddStaffScreen> createState() => _AddStaffScreenState();
 }
 
-class _AddStaffScreenState
-    extends State<AddStaffScreen> {
+class _AddStaffScreenState extends State<AddStaffScreen> {
+  static const String _pharmacistFullName = 'Pharmacist Demo';
+  static const String _pharmacistPhone = '0770000000';
+  static const String _pharmacistEmail = 'pharmacist@smartcare.com';
+  static const String _pharmacistPassword = 'Pharmacist@123';
 
-  final TextEditingController
-  staffNameController =
-  TextEditingController();
+  final TextEditingController staffNameController = TextEditingController();
 
-  final TextEditingController
-  phoneController =
-  TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
-  final TextEditingController
-  emailController =
-  TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
-  final TextEditingController
-  passwordController =
-  TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   bool isLoading = false;
   bool hidePassword = true;
 
-  String selectedRole =
-      "Receptionist";
+  String selectedRole = "Receptionist";
 
   final List<String> roles = [
-
     "Receptionist",
     "Nurse",
     "Lab Assistant",
@@ -44,120 +36,85 @@ class _AddStaffScreenState
     "Cashier",
     "Ward Assistant",
     "Management Staff",
-
   ];
 
   /// SAVE STAFF
   Future<void> saveStaff() async {
+    final isPharmacist = selectedRole == 'Pharmacist';
 
-    if (staffNameController
-        .text.isEmpty ||
+    final staffName = isPharmacist
+        ? _pharmacistFullName
+        : staffNameController.text.trim();
+    final phoneNumber = isPharmacist
+        ? _pharmacistPhone
+        : phoneController.text.trim();
+    final email = isPharmacist ? _pharmacistEmail : emailController.text.trim();
+    final password = isPharmacist
+        ? _pharmacistPassword
+        : passwordController.text.trim();
 
-        phoneController
-            .text.isEmpty ||
-
-        emailController
-            .text.isEmpty ||
-
-        passwordController
-            .text.isEmpty) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-          content:
-          Text("Please fill all fields"),
-        ),
-      );
+    if (staffName.isEmpty ||
+        phoneNumber.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
 
       return;
     }
 
     try {
-
       setState(() {
         isLoading = true;
       });
 
       /// CREATE AUTH USER
-      UserCredential userCredential =
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-        email:
-        emailController.text.trim(),
-
-        password:
-        passwordController.text.trim(),
-      );
-
-      String uid =
-          userCredential.user!.uid;
+      String uid = userCredential.user!.uid;
 
       /// SAVE FIRESTORE
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .set({
+      await FirebaseFirestore.instance.collection("users").doc(uid).set({
+        "fullName": staffName,
 
-        "fullName":
-        staffNameController.text
-            .trim(),
+        "phone": phoneNumber,
 
-        "phone":
-        phoneController.text
-            .trim(),
+        "email": email,
 
-        "email":
-        emailController.text
-            .trim(),
+        "roleType": selectedRole,
 
-        "roleType":
-        selectedRole,
+        "role": "staff",
 
-        "role":
-        "admin",
-
-        "createdAt":
-        Timestamp.now(),
+        "createdAt": Timestamp.now(),
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      if (!mounted) {
+        return;
+      }
 
-        const SnackBar(
-          content:
-          Text(
-              "Staff Added Successfully"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Staff Added Successfully")));
 
       Navigator.pop(context);
-
     } on FirebaseAuthException catch (e) {
+      if (!mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content:
-          Text(
-              e.message ??
-                  "Error"),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? "Error")));
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content:
-          Text(e.toString()),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
 
     setState(() {
@@ -167,65 +124,44 @@ class _AddStaffScreenState
 
   /// TEXT FIELD
   Widget buildTextField({
-
     required String hint,
 
     required IconData icon,
 
-    required TextEditingController
-    controller,
+    required TextEditingController controller,
 
     bool obscureText = false,
 
     Widget? suffixIcon,
 
-    TextInputType keyboardType =
-        TextInputType.text,
-
+    TextInputType keyboardType = TextInputType.text,
   }) {
-
     return Container(
-
-      margin:
-      const EdgeInsets.only(
-          bottom: 18),
+      margin: const EdgeInsets.only(bottom: 18),
 
       decoration: BoxDecoration(
-
         color: Colors.white,
 
-        borderRadius:
-        BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
       ),
 
       child: TextField(
-
         controller: controller,
 
         obscureText: obscureText,
 
-        keyboardType:
-        keyboardType,
+        keyboardType: keyboardType,
 
         decoration: InputDecoration(
-
           hintText: hint,
 
-          prefixIcon: Icon(
-            icon,
-            color: Colors.blue,
-          ),
+          prefixIcon: Icon(icon, color: Colors.blue),
 
-          suffixIcon:
-          suffixIcon,
+          suffixIcon: suffixIcon,
 
-          border:
-          InputBorder.none,
+          border: InputBorder.none,
 
-          contentPadding:
-          const EdgeInsets.symmetric(
-            vertical: 20,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 20),
         ),
       ),
     );
@@ -233,90 +169,55 @@ class _AddStaffScreenState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor:
-      const Color(0xFFF4F8FC),
+      backgroundColor: const Color(0xFFF4F8FC),
 
       appBar: AppBar(
-
-        backgroundColor:
-        const Color(0xFF1565C0),
+        backgroundColor: const Color(0xFF1565C0),
 
         title: const Text(
-
           "Add Staff Member",
 
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
       ),
 
       body: SingleChildScrollView(
-
-        padding:
-        const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
 
         child: Column(
           children: [
-
             /// NAME
             buildTextField(
-
               hint: "Staff Name",
 
               icon: Icons.person,
 
-              controller:
-              staffNameController,
+              controller: staffNameController,
             ),
 
             /// ROLE
             Container(
-
-              padding:
-              const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
 
               decoration: BoxDecoration(
-
                 color: Colors.white,
 
-                borderRadius:
-                BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18),
               ),
 
-              child:
-              DropdownButtonFormField<String>(
+              child: DropdownButtonFormField<String>(
+                initialValue: selectedRole,
 
-                value:
-                selectedRole,
+                decoration: const InputDecoration(border: InputBorder.none),
 
-                decoration:
-                const InputDecoration(
-                  border: InputBorder.none,
-                ),
-
-                items: roles.map(
-
-                      (e) =>
-                      DropdownMenuItem(
-
-                        value: e,
-
-                        child: Text(e),
-                      ),
-                ).toList(),
+                items: roles
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
 
                 onChanged: (value) {
-
                   setState(() {
-
                     selectedRole = value!;
-
                   });
                 },
               ),
@@ -326,62 +227,44 @@ class _AddStaffScreenState
 
             /// PHONE
             buildTextField(
-
               hint: "Phone Number",
 
               icon: Icons.phone,
 
-              controller:
-              phoneController,
+              controller: phoneController,
 
-              keyboardType:
-              TextInputType.phone,
+              keyboardType: TextInputType.phone,
             ),
 
             /// EMAIL
             buildTextField(
-
               hint: "Email",
 
               icon: Icons.email,
 
-              controller:
-              emailController,
+              controller: emailController,
 
-              keyboardType:
-              TextInputType.emailAddress,
+              keyboardType: TextInputType.emailAddress,
             ),
 
             /// PASSWORD
             buildTextField(
-
               hint: "Password",
 
               icon: Icons.lock,
 
-              controller:
-              passwordController,
+              controller: passwordController,
 
-              obscureText:
-              hidePassword,
+              obscureText: hidePassword,
 
-              suffixIcon:
-              IconButton(
-
+              suffixIcon: IconButton(
                 icon: Icon(
-
-                  hidePassword
-                      ? Icons.visibility_off
-                      : Icons.visibility,
+                  hidePassword ? Icons.visibility_off : Icons.visibility,
                 ),
 
                 onPressed: () {
-
                   setState(() {
-
-                    hidePassword =
-                    !hidePassword;
-
+                    hidePassword = !hidePassword;
                   });
                 },
               ),
@@ -391,53 +274,34 @@ class _AddStaffScreenState
 
             /// SAVE BUTTON
             SizedBox(
-
               width: double.infinity,
 
               height: 58,
 
               child: ElevatedButton(
+                onPressed: isLoading ? null : saveStaff,
 
-                onPressed:
-                isLoading
-                    ? null
-                    : saveStaff,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1565C0),
 
-                style:
-                ElevatedButton.styleFrom(
-
-                  backgroundColor:
-                  const Color(0xFF1565C0),
-
-                  shape:
-                  RoundedRectangleBorder(
-
-                    borderRadius:
-                    BorderRadius.circular(18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
                   ),
                 ),
 
-                child:
-                isLoading
-
-                    ? const CircularProgressIndicator(
-                  color: Colors.white,
-                )
-
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
+                        "Save Staff Member",
 
-                  "Save Staff Member",
+                        style: TextStyle(
+                          fontSize: 18,
 
-                  style: TextStyle(
+                          color: Colors.white,
 
-                    fontSize: 18,
-
-                    color: Colors.white,
-
-                    fontWeight:
-                    FontWeight.bold,
-                  ),
-                ),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ],
