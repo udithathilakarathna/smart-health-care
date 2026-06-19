@@ -122,9 +122,9 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final bookedDoctorIds = appointmentSnapshot.data!.docs
+                  final bookedSessionIds = appointmentSnapshot.data!.docs
                       .map((doc) => doc.data() as Map<String, dynamic>)
-                      .map((data) => data['doctorId']?.toString().trim() ?? '')
+                      .map((data) => data['sessionId']?.toString().trim() ?? '')
                       .where((id) => id.isNotEmpty)
                       .toSet();
 
@@ -179,8 +179,9 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                               final doctorId = doctorDoc.id;
                               final specialization =
                                   doctorDoc['specialization']?.toString() ?? '';
-                              final alreadyBooked = bookedDoctorIds.contains(
-                                doctorId,
+                              final sessionId = session.id;
+                              final alreadyBooked = bookedSessionIds.contains(
+                                sessionId,
                               );
                               final canBook =
                                   availableSlots > 0 && !alreadyBooked;
@@ -304,26 +305,26 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                                                                     )
                                                                     .get();
 
-                                                            final alreadyBookedDoctor =
+                                                            final alreadyBookedSession =
                                                                 currentAppointments.docs.any((
                                                                   doc,
                                                                 ) {
                                                                   final data =
                                                                       doc.data();
-                                                                  return data['doctorId']
+                                                                  return data['sessionId']
                                                                           ?.toString()
                                                                           .trim() ==
-                                                                      doctorId;
+                                                                      sessionId;
                                                                 });
 
-                                                            if (alreadyBookedDoctor) {
+                                                            if (alreadyBookedSession) {
                                                               if (context
                                                                   .mounted) {
                                                                 Navigator.pop(
                                                                   context,
                                                                 );
                                                                 _showSnack(
-                                                                  'You have already booked Dr. $doctorName.',
+                                                                  'You have already booked this session.',
                                                                 );
                                                               }
                                                               return;
